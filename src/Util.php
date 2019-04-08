@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace basis;
+namespace HZEX;
 
 class Util
 {

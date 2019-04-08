@@ -19,12 +19,12 @@
     },
     "autoload": {
         "psr-4": {
-            "nhzex\\": "src/"
+            "HZEX\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "nhzex\\Test\\": "test/"
+            "Tests\\": "tests/"
         }
     },
     "config": {

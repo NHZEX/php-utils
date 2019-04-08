@@ -5,8 +5,9 @@
  * Date: 2019/1/24
  * Time: 10:31
  */
+declare(strict_types=1);
 
-namespace struct;
+namespace HZEX\DataStruct;
 
 use ArrayAccess;
 use JsonSerializable;

@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace struct;
+namespace HZEX\DataStruct;
 
 use ArrayAccess;
 use Exception;
