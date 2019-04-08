@@ -1,0 +1,33 @@
+{
+    "name": "nhzex/n-helper",
+    "description": "助手",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "auooru",
+            "email": "auooru@outlook.com"
+        }
+    ],
+    "require": {
+        "php": "~7.1",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "nhzex\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "nhzex\\Test\\": "test/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}
