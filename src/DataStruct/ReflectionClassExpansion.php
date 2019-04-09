@@ -98,7 +98,6 @@ class ReflectionClassExpansion
                     continue;
                 }
             }
-
         }
 
         return $useStatements;
@@ -148,10 +147,8 @@ class ReflectionClassExpansion
                 } else {
                     $this->fastUseMapping[$use['alias']] = $use['class'];
                 }
-
             }
         }
-
         return $this->fastUseMapping;
     }
 

@@ -79,7 +79,7 @@ class Base implements ArrayAccess, JsonSerializable
                     ];
                     $targetClassName = null;
                     foreach ($targetClassNames as $className) {
-                        if(is_string($className) && (class_exists($className) || interface_exists($className))) {
+                        if (is_string($className) && (class_exists($className) || interface_exists($className))) {
                             $targetClassName = $className;
                         }
                     }
@@ -328,7 +328,6 @@ class Base implements ArrayAccess, JsonSerializable
         }
 
         if (null === $result && is_object($inputValue)) {
-
             // 实例类反射
             $targetRef = new ReflectionClass($targetType);
             $valueRef = new ReflectionClass($inputValue);
