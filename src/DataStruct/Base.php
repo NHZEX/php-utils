@@ -84,7 +84,7 @@ class Base implements ArrayAccess, JsonSerializable
                         }
                     }
                     if (null === $targetClassName) {
-                        throw new RuntimeException("目标类型类无法匹配有效导入 {$targetClassName}");
+                        throw new RuntimeException("目标类型类无法匹配有效导入{$name} {$targetClassName}");
                     }
                     $realType = $targetClassName;
                 }
@@ -351,7 +351,7 @@ class Base implements ArrayAccess, JsonSerializable
         }
 
         if (true !== $result) {
-            $msg = sprintf('属性类型不一致错误，当前类型 %s，目标类型 %s', $currentType, $targetType);
+            $msg = sprintf('属性类型不一致错误 %s，当前类型 %s，目标类型 %s', $name, $currentType, $targetType);
             throw new RuntimeException($msg);
         }
 
