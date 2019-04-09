@@ -33,7 +33,7 @@ class Base implements ArrayAccess, JsonSerializable
     private $useStatements = [];
     private $hidden_key = [];
     private $read_only_key = [];
-    private $change_time = 0;
+    private $change_count = 0;
 
     public function __construct(iterable $data = [])
     {
@@ -67,7 +67,8 @@ class Base implements ArrayAccess, JsonSerializable
             foreach ($match_doc as $info) {
                 $name = $info['name'];
                 $control = trim($info['control'] ?? '');
-                $realType = $info['type'];
+                $type = $info['type'];
+                $realType = $this->typeConversion($type);
 
                 // 分析类型
                 if (false === $this->isTypeNotClass($realType)) {
@@ -90,7 +91,7 @@ class Base implements ArrayAccess, JsonSerializable
 
                 // 记录元数据
                 $this->metadata[$name] = [
-                    'type' => $info['type'],
+                    'type' => $type,
                     'realType' => $realType,
                     'control' => $control,
                 ];
@@ -159,6 +160,7 @@ class Base implements ArrayAccess, JsonSerializable
             return false;
         } else {
             unset($this->property_data[$name]);
+            $this->dataChange();
             return true;
         }
     }
@@ -168,10 +170,64 @@ class Base implements ArrayAccess, JsonSerializable
      */
     protected function dataChange()
     {
-        $this->change_time = time();
+        $this->change_count++;
     }
 
     /**
+     * 获取数据更改时间
+     * @return int
+     */
+    public function getDataChangeCount()
+    {
+        return $this->change_count;
+    }
+
+    /**
+     * 类型统一
+     * @param string $type
+     * @return string
+     * @link https://www.php.net/manual/en/language.types.php
+     */
+    protected function typeConversion(string $type)
+    {
+        switch ($type) {
+            case 'bool':
+            case 'boolean':
+            case 'true':
+            case 'false':
+                $result = 'bool';
+                break;
+            case 'int':
+            case 'integer':
+            case 'number':
+                $result = 'int';
+                break;
+            case 'double':
+            case 'float':
+                $result = 'float';
+                break;
+            case 'callable':
+            case 'callback':
+                $result = 'callable';
+                break;
+            case '':
+            case 'mixed':
+                $result = 'mixed';
+                break;
+            case 'string':
+            case 'array':
+            case 'iterable':
+            case 'object':
+            case 'resource':
+            case 'null':
+            default:
+                $result = $type;
+        }
+        return $result;
+    }
+
+    /**
+     * 这个类型不是一个类
      * @param string $type
      * @return bool
      */
@@ -179,23 +235,35 @@ class Base implements ArrayAccess, JsonSerializable
     {
         static $types = [
             'bool' => 0,
-            'boolean' => 0,
-            'true' => 0,
-            'false' => 0,
             'int' => 0,
-            'integer' => 0,
-            'number' => 0,
-            'double' => 0,
             'float' => 0,
             'string' => 0,
             'array' => 0,
+            'iterable' => 0,
             'object' => 0,
             'resource' => 0,
             'null' => 0,
             'callable' => 0,
-            'callback' => 0,
             'mixed' => 0,
             '' => 0,
+        ];
+
+        return isset($types[$type]);
+    }
+
+    /**
+     * 是否基本类型
+     * @param string $type
+     * @return bool
+     */
+    protected function isBasicType(string $type)
+    {
+        static $types = [
+            'bool' => 0,
+            'int' => 0,
+            'float' => 0,
+            'string' => 0,
+            'null' => 0,
         ];
 
         return isset($types[$type]);
@@ -225,17 +293,11 @@ class Base implements ArrayAccess, JsonSerializable
 
         switch ($targetType) {
             case 'bool':
-            case 'boolean':
-            case 'true':
-            case 'false':
                 $result = is_bool($inputValue);
                 break;
             case 'int':
-            case 'integer':
-            case 'number':
                 $result = is_int($inputValue);
                 break;
-            case 'double':
             case 'float':
                 $result = is_float($inputValue);
                 break;
@@ -244,6 +306,9 @@ class Base implements ArrayAccess, JsonSerializable
                 break;
             case 'array':
                 $result = is_array($inputValue);
+                break;
+            case 'iterable':
+                $result = is_iterable($inputValue);
                 break;
             case 'object':
                 $result = is_object($inputValue);
@@ -255,10 +320,8 @@ class Base implements ArrayAccess, JsonSerializable
                 $result = is_null($inputValue);
                 break;
             case 'callable':
-            case 'callback':
                 $result = is_callable($inputValue);
                 break;
-            case '':
             case 'mixed':
                 $result = true;
                 break;
@@ -316,7 +379,17 @@ class Base implements ArrayAccess, JsonSerializable
             throw new Exception(static::class . '::' . $name . " read only");
         }
         $this->typeCheck($name, $value);
+        $info = $this->metadata[$name] ?? null;
+        if ($info
+            && $this->isBasicType($info['realType'])
+            && isset($this->property_data[$name])
+            && $this->property_data[$name] === $value
+        ) {
+            // 内容一致不做更改
+            return;
+        }
         $this->property_data[$name] = $value;
+        $this->dataChange();
     }
 
     /**

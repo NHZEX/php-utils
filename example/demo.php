@@ -9,10 +9,32 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $obj = new StructTest([]);
 
+var_dump($obj->getDataChangeCount());
 $obj->test0 = new Test1234();
 $obj->test1 = new Test123();
 $obj->test2 = new RenMinBi();
 $obj->test3 = new Test1234();
+$obj->test4 = [];
+$obj->test5 = new stdClass();
+
+var_dump($obj->getDataChangeCount());
+$obj->expire_time = 123;
+var_dump($obj->expire_time);
+var_dump($obj->getDataChangeCount());
+$obj->erase('expire_time', true);
+var_dump($obj->getDataChangeCount());
+$obj->expire_time = 123;
+var_dump($obj->expire_time);
+var_dump($obj->getDataChangeCount());
+$obj->expire_time = 123;
+var_dump($obj->expire_time);
+var_dump($obj->getDataChangeCount());
+$obj->expire_time = 456;
+var_dump($obj->expire_time);
+var_dump($obj->getDataChangeCount());
+$obj->expire_time = 123;
+var_dump($obj->expire_time);
+var_dump($obj->getDataChangeCount());
 
 //$ref = new ReflectionClass($obj);
 //$refe = new ReflectionClassExpansion($ref);
