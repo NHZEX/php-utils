@@ -67,11 +67,31 @@ class Base implements ArrayAccess, JsonSerializable
             foreach ($match_doc as $info) {
                 $name = $info['name'];
                 $control = trim($info['control'] ?? '');
+                $realType = $info['type'];
 
-                // 写入元数据
+                // 分析类型
+                if (false === $this->isTypeNotClass($realType)) {
+                    $targetClassNames = [
+                        $this->useStatements[$realType] ?? null,
+                        $this->namespace . '\\' . $realType,
+                        $realType,
+                    ];
+                    $targetClassName = null;
+                    foreach ($targetClassNames as $className) {
+                        if(is_string($className) && (class_exists($className) || interface_exists($className))) {
+                            $targetClassName = $className;
+                        }
+                    }
+                    if (null === $targetClassName) {
+                        throw new RuntimeException("目标类型类无法匹配有效导入 {$targetClassName}");
+                    }
+                    $realType = $targetClassName;
+                }
+
+                // 记录元数据
                 $this->metadata[$name] = [
                     'type' => $info['type'],
-                    'realType' => $info['type'], // TODO 转换为真实类型，提升性能
+                    'realType' => $realType,
                     'control' => $control,
                 ];
                 // 写入只读控制
@@ -152,6 +172,36 @@ class Base implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * @param string $type
+     * @return bool
+     */
+    protected function isTypeNotClass(string $type)
+    {
+        static $types = [
+            'bool' => 0,
+            'boolean' => 0,
+            'true' => 0,
+            'false' => 0,
+            'int' => 0,
+            'integer' => 0,
+            'number' => 0,
+            'double' => 0,
+            'float' => 0,
+            'string' => 0,
+            'array' => 0,
+            'object' => 0,
+            'resource' => 0,
+            'null' => 0,
+            'callable' => 0,
+            'callback' => 0,
+            'mixed' => 0,
+            '' => 0,
+        ];
+
+        return isset($types[$type]);
+    }
+
+    /**
      * 类型检查
      * @param $name
      * @param $inputValue
@@ -169,7 +219,7 @@ class Base implements ArrayAccess, JsonSerializable
             return false;
         }
 
-        $targetType = $info['type'];
+        $targetType = $info['realType'];
         $currentType = gettype($inputValue);
         $result = null;
 
@@ -215,28 +265,13 @@ class Base implements ArrayAccess, JsonSerializable
         }
 
         if (null === $result && is_object($inputValue)) {
-            $targetClassNames = [
-                $this->useStatements[$targetType] ?? null,
-                $this->namespace . '\\' . $targetType,
-                $targetType,
-            ];
-            $targetClassName = null;
-            foreach ($targetClassNames as $className) {
-                if(is_string($className) && (class_exists($className) || interface_exists($className))) {
-                    $targetClassName = $className;
-                }
-            }
-            if (null === $targetClassName) {
-                throw new RuntimeException("目标类型类无法匹配有效导入 {$targetClassName}");
-            }
 
             // 实例类反射
-            $targetRef = new ReflectionClass($targetClassName);
+            $targetRef = new ReflectionClass($targetType);
             $valueRef = new ReflectionClass($inputValue);
 
-            // 刷新类型
+            // 获取类型
             $currentType = $valueRef->getName();
-            $targetType = $targetRef->getName();
 
             // 如果目标是接口，则判断当前值是否实现该接口
             if ($targetRef->isInterface()
