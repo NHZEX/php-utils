@@ -6,6 +6,8 @@ use Exception;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
+use Symfony\Component\VarExporter\Exception\ExceptionInterface;
+use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * Trait StructSupport
@@ -69,7 +71,7 @@ trait StructSupport
     }
 
     /**
-     *
+     * @throws ExceptionInterface
      */
     public function build()
     {
@@ -86,7 +88,7 @@ trait StructSupport
         $data = is_array($data) ? $data : [];
         $data[$class_name] = $class_data;
 
-        $content = '<?php' . PHP_EOL . var_export($data, true) . ';';
+        $content = '<?php' . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL;
         file_put_contents($file, $content);
     }
 
