@@ -14,7 +14,7 @@ use stdClass;
  * @package app\logic\payment\struct
  * @property bool     $is_success            [read] 是否成功
  * @property string   $body                  [read] 字符串内容
- * @property int      $expire_time           [] 失效时间
+ * @property int      $expire_time           [read] 失效时间
  * @property array    $array                 [read] 数组内容
  * @property Test123  $test0                 [read] 继承测试1
  * @property Test123  $test1                 [read] 类测试1(相同命名空间)
