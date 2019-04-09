@@ -18,7 +18,7 @@ $obj->test4 = [];
 $obj->test5 = new stdClass();
 
 var_dump($obj->getDataChangeCount());
-$obj->expire_time = 123;
+$obj->expire_time = null;
 var_dump($obj->expire_time);
 var_dump($obj->getDataChangeCount());
 $obj->erase('expire_time');

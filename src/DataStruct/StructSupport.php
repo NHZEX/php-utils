@@ -7,10 +7,15 @@ use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
 
+/**
+ * Trait StructSupport
+ * @package HZEX\DataStruct
+ * TODO 支持广泛原始类型检查(安全类型转换) https://wiki.php.net/rfc/scalar_type_hints_v5
+ * TODO 编译优化代码
+ */
 trait StructSupport
 {
     private $metadata = [];
-    private $namespace = '';
     private $useStatements = [];
 
     /**
@@ -19,11 +24,11 @@ trait StructSupport
      */
     protected function loadRule(): void
     {
-        static $regex = '~@property\s+(?<type>\w+)\s+\$(?<name>[\w]+)\s+(\[(?<control>\w*)\])?~m';
+        static $regex = '~@property\s+(?<type>[\w|]+)\s+\$(?<name>[\w]+)\s+(\[(?<control>\w*)\])?~m';
 
         $ref = new ReflectionClass($this);
         $refe = new ReflectionClassExpansion($ref);
-        $this->namespace = $ref->getNamespaceName();
+        $namespace = $ref->getNamespaceName();
         $this->useStatements = $refe->getFastUseMapping();
 
         $doc = $ref->getDocComment();
@@ -31,43 +36,61 @@ trait StructSupport
         if (preg_match_all($regex, $doc, $match_doc, PREG_SET_ORDER)) {
             foreach ($match_doc as $info) {
                 $name = $info['name'];
-                $control = trim($info['control'] ?? '');
                 $type = $info['type'];
-                $realType = $this->typeConversion($type);
-
-                // 分析类型
-                if (false === $this->isTypeNotClass($realType)) {
-                    $targetClassNames = [
-                        $this->useStatements[$realType] ?? null,
-                        $this->namespace . '\\' . $realType,
-                        $realType,
-                    ];
-                    $targetClassName = null;
-                    foreach ($targetClassNames as $className) {
-                        if (is_string($className) && (class_exists($className) || interface_exists($className))) {
-                            $targetClassName = $className;
-                        }
-                    }
-                    if (null === $targetClassName) {
-                        throw new RuntimeException("目标类型类无法匹配有效导入{$name} {$targetClassName}");
-                    }
-                    $realType = $targetClassName;
-                }
+                $types = array_map('trim', explode('|', $type));
+                $control = trim($info['control'] ?? '');
 
                 // 记录元数据
                 $this->metadata[$name] = [
-                    'type' => $type,
-                    'realType' => $realType,
+                    'type' => $info['type'],
+                    'realType' => [],
                     'control' => $control,
+                    'isBasicType' => $this->isBasicType($info['type']),
                 ];
-                // 写入只读控制
+                // 处理类型定义
+                foreach ($types as $k => $type) {
+                    // 统一转换标指类型
+                    $realType = $this->typeConversion($type);
+                    // 分析类型是否类
+                    if (false === $isNotClass = $this->isNotClass($realType)) {
+                        $realType = $this->classNameImport($name, $realType, $namespace);
+                    }
+                    $this->metadata[$name]['realType'][$realType] = !$isNotClass;
+                }
+
+                // 属性只读
                 if ('read' === $control) {
                     $read_olny[$name] = true;
                 }
             }
         }
-
         $this->read_only_key = $read_olny;
+    }
+
+    /**
+     * 类名解析导入
+     * @param $name
+     * @param $type
+     * @param $namespace
+     * @return string|null
+     */
+    protected function classNameImport($name, $type, $namespace)
+    {
+        $targetClassNames = [
+            $this->useStatements[$type] ?? null,
+            $namespace . '\\' . $type,
+            $type,
+        ];
+        $targetClassName = null;
+        foreach ($targetClassNames as $className) {
+            if (is_string($className) && (class_exists($className) || interface_exists($className))) {
+                $targetClassName = $className;
+            }
+        }
+        if (null === $targetClassName) {
+            throw new RuntimeException("目标类型类无法匹配有效导入{$name} {$targetClassName}");
+        }
+        return $targetClassName;
     }
 
     /**
@@ -119,7 +142,7 @@ trait StructSupport
      * @param string $type
      * @return bool
      */
-    protected function isTypeNotClass(string $type)
+    protected function isNotClass(string $type)
     {
         static $types = [
             'bool' => 0,
@@ -133,7 +156,6 @@ trait StructSupport
             'null' => 0,
             'callable' => 0,
             'mixed' => 0,
-            '' => 0,
         ];
 
         return isset($types[$type]);
@@ -168,81 +190,85 @@ trait StructSupport
      */
     public function typeCheck($name, $inputValue): bool
     {
-        // TODO 支持多参检查定义解析 string|bool
-
         $info = $this->metadata[$name] ?? null;
         if (null === $info) {
             return false;
         }
 
-        $targetType = $info['realType'];
+        $realType = $info['realType'];
         $currentType = gettype($inputValue);
         $result = null;
 
-        switch ($targetType) {
-            case 'bool':
-                $result = is_bool($inputValue);
-                break;
-            case 'int':
-                $result = is_int($inputValue);
-                break;
-            case 'float':
-                $result = is_float($inputValue);
-                break;
-            case 'string':
-                $result = is_string($inputValue);
-                break;
-            case 'array':
-                $result = is_array($inputValue);
-                break;
-            case 'iterable':
-                $result = is_iterable($inputValue);
-                break;
-            case 'object':
-                $result = is_object($inputValue);
-                break;
-            case 'resource':
-                $result = is_resource($inputValue);
-                break;
-            case 'null':
-                $result = is_null($inputValue);
-                break;
-            case 'callable':
-                $result = is_callable($inputValue);
-                break;
-            case 'mixed':
-                $result = true;
-                break;
-        }
+        foreach ($realType as $targetType => $isClass) {
+            $result = null;
+            if ($isClass && is_object($inputValue)) {
+                // 实例类反射
+                $targetRef = new ReflectionClass($targetType);
+                $valueRef = new ReflectionClass($inputValue);
 
-        if (null === $result && is_object($inputValue)) {
-            // 实例类反射
-            $targetRef = new ReflectionClass($targetType);
-            $valueRef = new ReflectionClass($inputValue);
+                // 获取类型
+                $currentType = $valueRef->getName();
 
-            // 获取类型
-            $currentType = $valueRef->getName();
+                // 如果目标是接口，则判断当前值是否实现该接口
+                if ($targetRef->isInterface()
+                    && $valueRef->implementsInterface($targetRef)
+                ) {
+                    $result = true;
+                }
 
-            // 如果目标是接口，则判断当前值是否实现该接口
-            if ($targetRef->isInterface()
-                && $valueRef->implementsInterface($targetRef)
-            ) {
-                $result = true;
+                // 如果目标是类，则先判断类是否一致，在判断类是否包含
+                if ($targetRef->getName() === $currentType
+                    || $valueRef->isSubclassOf($targetRef->getName())
+                ) {
+                    $result = true;
+                }
+            } else {
+                switch ($targetType) {
+                    case 'bool':
+                        $result = is_bool($inputValue);
+                        break;
+                    case 'int':
+                        $result = is_int($inputValue);
+                        break;
+                    case 'float':
+                        $result = is_float($inputValue);
+                        break;
+                    case 'string':
+                        $result = is_string($inputValue);
+                        break;
+                    case 'array':
+                        $result = is_array($inputValue);
+                        break;
+                    case 'iterable':
+                        $result = is_iterable($inputValue);
+                        break;
+                    case 'object':
+                        $result = is_object($inputValue);
+                        break;
+                    case 'resource':
+                        $result = is_resource($inputValue);
+                        break;
+                    case 'null':
+                        $result = is_null($inputValue);
+                        break;
+                    case 'callable':
+                        $result = is_callable($inputValue);
+                        break;
+                    case 'mixed':
+                        $result = true;
+                        break;
+                }
             }
-
-            // 如果目标是类，则先判断类是否一致，在判断类是否包含
-            if ($targetRef->getName() === $currentType
-                || $valueRef->isSubclassOf($targetRef->getName())
-            ) {
-                $result = true;
+            if (true === $result) {
+                break;
             }
         }
 
         if (true !== $result) {
-            $msg = sprintf('属性类型不一致错误 %s，当前类型 %s，目标类型 %s', $name, $currentType, $targetType);
+            $msg = sprintf('属性类型不一致错误 %s，当前类型 %s，目标类型 %s', $name, $currentType, $info['type']);
             throw new RuntimeException($msg);
         }
 
-        return $result;
+        return true;
     }
 }

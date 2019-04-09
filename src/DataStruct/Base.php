@@ -16,8 +16,6 @@ use JsonSerializable;
 /**
  * Class Base2
  * @package struct
- * TODO 支持预设默认值
- * TODO 支持广泛原始类型检查(安全类型转换) https://wiki.php.net/rfc/scalar_type_hints_v5
  * TODO 需要做单元测试
  */
 class Base implements ArrayAccess, JsonSerializable
@@ -34,7 +32,7 @@ class Base implements ArrayAccess, JsonSerializable
 
     public function __construct(iterable $data = [])
     {
-        $this->property_data = (array)$data;
+        $this->property_data = (array) $data;
         $this->initialize();
     }
 
@@ -144,12 +142,12 @@ class Base implements ArrayAccess, JsonSerializable
     public function __set(string $name, $value): void
     {
         if (isset($this->read_only_key[$name]) && isset($this->property_data[$name])) {
-            throw new Exception(static::class . '::' . $name . " read only");
+            throw new Exception(static::class . '::' . $name . ' read only');
         }
         $this->typeCheck($name, $value);
         $info = $this->metadata[$name] ?? null;
         if ($info
-            && $this->isBasicType($info['realType'])
+            && $info['isBasicType']
             && isset($this->property_data[$name])
             && $this->property_data[$name] === $value
         ) {
