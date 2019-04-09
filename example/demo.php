@@ -30,6 +30,9 @@ $obj->expire_time = 123;
 var_dump($obj->expire_time);
 var_dump($obj->getDataChangeCount());
 
+StructTest::$BUILD_PATH = '../runtime/';
+$obj->build();
+
 //$ref = new ReflectionClass($obj);
 //$refe = new ReflectionClassExpansion($ref);
 //var_dump($refe->readHeadSource());

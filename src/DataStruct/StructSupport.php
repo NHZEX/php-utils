@@ -15,8 +15,9 @@ use RuntimeException;
  */
 trait StructSupport
 {
+    public static $BUILD_PATH = './';
+
     private $metadata = [];
-    private $useStatements = [];
 
     /**
      * 自动解析规则
@@ -29,7 +30,7 @@ trait StructSupport
         $ref = new ReflectionClass($this);
         $refe = new ReflectionClassExpansion($ref);
         $namespace = $ref->getNamespaceName();
-        $this->useStatements = $refe->getFastUseMapping();
+        $useStatements = $refe->getFastUseMapping();
 
         $doc = $ref->getDocComment();
         $read_olny = [];
@@ -53,7 +54,7 @@ trait StructSupport
                     $realType = $this->typeConversion($type);
                     // 分析类型是否类
                     if (false === $isNotClass = $this->isNotClass($realType)) {
-                        $realType = $this->classNameImport($name, $realType, $namespace);
+                        $realType = $this->classNameImport($name, $realType, $namespace, $useStatements);
                     }
                     $this->metadata[$name]['realType'][$realType] = !$isNotClass;
                 }
@@ -68,16 +69,39 @@ trait StructSupport
     }
 
     /**
+     *
+     */
+    public function build()
+    {
+        $class_name = static::class;
+        $class_hash = md5_file(__FILE__);
+        $class_data = [
+            'hash' => $class_hash,
+            'metadata' => $this->metadata,
+        ];
+
+        $file = self::$BUILD_PATH . 'struct.php';
+        /** @noinspection PhpIncludeInspection */
+        $data = is_file($file) ? require $file : [];
+        $data = is_array($data) ? $data : [];
+        $data[$class_name] = $class_data;
+
+        $content = '<?php' . PHP_EOL . var_export($data, true) . ';';
+        file_put_contents($file, $content);
+    }
+
+    /**
      * 类名解析导入
-     * @param $name
-     * @param $type
-     * @param $namespace
+     * @param string $name
+     * @param string $type
+     * @param string $namespace
+     * @param array  $useStatements
      * @return string|null
      */
-    protected function classNameImport($name, $type, $namespace)
+    protected function classNameImport(string $name, string $type, string $namespace, array $useStatements)
     {
         $targetClassNames = [
-            $this->useStatements[$type] ?? null,
+            $useStatements[$type] ?? null,
             $namespace . '\\' . $type,
             $type,
         ];
