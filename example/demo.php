@@ -9,7 +9,9 @@ use HZEX\UnitConvertor\RenMinBi;
 require __DIR__ . '/../vendor/autoload.php';
 
 BaseData::$BUILD_PATH = '../runtime/';
-$obj = new StructTest([]);
+$obj = new StructTest([
+    'expire_time' => 1222,
+]);
 
 var_dump($obj->getDataChangeCount());
 $obj->test0 = new Test1234();

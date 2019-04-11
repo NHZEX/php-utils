@@ -13,7 +13,6 @@ use Symfony\Component\VarExporter\VarExporter;
  * @package HZEX\DataStruct
  * 支持扩大原始转换 https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.2
  * TODO 支持隐藏声明控制符
- * TODO 支持先声明后使用标志
  */
 trait StructSupport
 {

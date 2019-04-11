@@ -25,17 +25,25 @@ class Base implements ArrayAccess, JsonSerializable
     protected const METADATA_ATTR = 'attr';
     protected const METADATA_READ_ONLY = 'readOnly';
 
-    /** @var array|iterable */
-    protected $property_data = [];
-    protected $original_data = [];
+    /** @var bool 严格模式 */
+    protected $strictMode = false;
 
-    private $hidden_key = [];
-    private $change_count = 0;
+    /** @var array|iterable */
+    protected $propertyData = [];
+    protected $originalData = [];
+
+    private $hiddenKey = [];
+    private $changeCount = 0;
 
     public function __construct(iterable $data = [])
     {
+        // 加载规则
         self::loadMeatData();
-        $this->property_data = (array) $data;
+        // 载入初始值
+        foreach ($data as $key => $datum) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->__set($key, $datum);
+        }
         $this->initialize();
     }
 
@@ -66,7 +74,7 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function setHidden(array $hidden): self
     {
-        $this->hidden_key = array_flip($hidden);
+        $this->hiddenKey = array_flip($hidden);
         return $this;
     }
 
@@ -76,7 +84,7 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function all(): array
     {
-        return $this->property_data;
+        return $this->propertyData;
     }
 
 
@@ -87,12 +95,12 @@ class Base implements ArrayAccess, JsonSerializable
     public function toArray(): array
     {
         // 过滤隐藏值输出属性
-        if (count($this->hidden_key)) {
-            return array_diff_key($this->property_data, $this->hidden_key);
+        if (count($this->hiddenKey)) {
+            return array_diff_key($this->propertyData, $this->hiddenKey);
         }
 
         // 输出属性
-        return $this->property_data;
+        return $this->propertyData;
     }
 
     /**
@@ -102,8 +110,8 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function erase($name): bool
     {
-        if (isset($this->property_data[$name])) {
-            unset($this->property_data[$name]);
+        if (isset($this->propertyData[$name])) {
+            unset($this->propertyData[$name]);
             $this->dataChange();
             return true;
         }
@@ -115,7 +123,7 @@ class Base implements ArrayAccess, JsonSerializable
      */
     protected function dataChange()
     {
-        $this->change_count++;
+        $this->changeCount++;
     }
 
     /**
@@ -124,7 +132,7 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function getDataChangeCount()
     {
-        return $this->change_count;
+        return $this->changeCount;
     }
 
     /**
@@ -134,7 +142,7 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function __get(string $name)
     {
-        return $this->property_data[$name];
+        return $this->propertyData[$name];
     }
 
     /**
@@ -145,20 +153,23 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function __set(string $name, $value): void
     {
-        if (isset($this->getMetaData(self::METADATA_READ_ONLY)[$name]) && isset($this->property_data[$name])) {
-            throw new Exception(static::class . '::' . $name . ' read only');
+        if (isset($this->getMetaData(self::METADATA_READ_ONLY)[$name]) && isset($this->propertyData[$name])) {
+            throw new Exception(static::class . '->$' . $name . ' Read only');
+        }
+        $attrInfo = $this->getMetaData(self::METADATA_ATTR)[$name] ?? null;
+        if ($this->strictMode && null === $attrInfo) {
+            throw new Exception(static::class . '->$' . $name . ' Undefined');
         }
         $this->typeCheck($name, $value);
-        $info = $this->getMetaData(self::METADATA_ATTR)[$name] ?? null;
-        if ($info
-            && $info['isBasicType']
-            && isset($this->property_data[$name])
-            && $this->property_data[$name] === $value
+        if ($attrInfo
+            && $attrInfo['isBasicType']
+            && isset($this->propertyData[$name])
+            && $this->propertyData[$name] === $value
         ) {
             // 内容一致不做更改
             return;
         }
-        $this->property_data[$name] = $value;
+        $this->propertyData[$name] = $value;
         $this->dataChange();
     }
 
@@ -169,7 +180,7 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function __isset($name): bool
     {
-        return isset($this->property_data[$name]);
+        return isset($this->propertyData[$name]);
     }
 
     /**
@@ -180,9 +191,9 @@ class Base implements ArrayAccess, JsonSerializable
     public function __unset($name): void
     {
         if (isset($this->getMetaData(self::METADATA_READ_ONLY)[$name])) {
-            throw new Exception(static::class . 'property' . $name . " read only");
+            throw new Exception(static::class . '->$' . $name . ' Read only');
         }
-        unset($this->property_data[$name]);
+        unset($this->propertyData[$name]);
     }
 
     /**

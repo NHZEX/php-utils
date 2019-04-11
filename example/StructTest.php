@@ -24,6 +24,8 @@ use stdClass;
  */
 class StructTest extends Base
 {
+    protected $strictMode = true;
+
     protected function initialize(): void
     {
     }
