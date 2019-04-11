@@ -8,7 +8,7 @@ use HZEX\UnitConvertor\RenMinBi;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-BaseData::$BUILD_PATH = '../runtime/';
+BaseData::setCacheBuildPath('./../runtime/');
 $obj = new StructTest([
     'expire_time' => 1222,
 ]);

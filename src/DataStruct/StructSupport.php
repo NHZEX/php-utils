@@ -16,8 +16,17 @@ use Symfony\Component\VarExporter\VarExporter;
  */
 trait StructSupport
 {
-    public static $BUILD_PATH = './';
-    protected static $GLOBAL_METADATA = [];
+    private static $BUILD_PATH = './';
+    private static $GLOBAL_METADATA = [];
+
+    public static function setCacheBuildPath(string $path): bool
+    {
+        if (!is_dir($path)) {
+            return false;
+        }
+        self::$BUILD_PATH = realpath($path) . DIRECTORY_SEPARATOR;
+        return true;
+    }
 
     /**
      * 加载结构元数据
