@@ -91,7 +91,7 @@ trait StructSupport
             }
         }
         return [
-            'hash' => md5_file(__FILE__),
+            'hash' => md5_file($ref->getFileName()),
             self::METADATA_ATTR => $metadataAttr,
             self::METADATA_READ_ONLY => $metadataReadOnly,
         ];
