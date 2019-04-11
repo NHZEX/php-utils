@@ -100,6 +100,17 @@ trait StructSupport
     }
 
     /**
+     * 设置元数据
+     * @param string|null $type
+     * @param mixed       $value
+     * @return void
+     */
+    protected function setMetaData(string $type, $value): void
+    {
+        self::$GLOBAL_METADATA[static::class][$type] = $value;
+    }
+
+    /**
      * 加载缓存文件
      */
     public static function loadCacheFile(): void

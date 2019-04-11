@@ -3,11 +3,12 @@
 use Example\StructTest;
 use Example\Test123;
 use Example\Test1234;
+use HZEX\DataStruct\Base as BaseData;
 use HZEX\UnitConvertor\RenMinBi;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-StructTest::$BUILD_PATH = '../runtime/';
+BaseData::$BUILD_PATH = '../runtime/';
 $obj = new StructTest([]);
 
 var_dump($obj->getDataChangeCount());
@@ -31,7 +32,7 @@ $obj->expire_time = 123;
 var_dump($obj->expire_time);
 var_dump($obj->getDataChangeCount());
 
-$obj->saveCacheFile();
+BaseData::saveCacheFile();
 
 //$ref = new ReflectionClass($obj);
 //$refe = new ReflectionClassExpansion($ref);

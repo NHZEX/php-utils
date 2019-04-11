@@ -55,7 +55,7 @@ class Base implements ArrayAccess, JsonSerializable
      */
     protected function setReadProperty(array $keys): self
     {
-        self::$GLOBAL_METADATA[self::METADATA_READ_ONLY] = array_flip($keys);
+        $this->setMetaData(self::METADATA_READ_ONLY, array_flip($keys));
         return $this;
     }
 
