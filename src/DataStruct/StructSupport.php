@@ -6,36 +6,51 @@ use Exception;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
-use Symfony\Component\VarExporter\Exception\ExceptionInterface;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * Trait StructSupport
  * @package HZEX\DataStruct
- * TODO 支持广泛原始类型检查(安全类型转换) https://wiki.php.net/rfc/scalar_type_hints_v5
- * TODO 编译优化代码
+ * 支持扩大原始转换 https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.2
+ * TODO 支持隐藏声明控制符
+ * TODO 支持先声明后使用标志
  */
 trait StructSupport
 {
     public static $BUILD_PATH = './';
+    protected static $GLOBAL_METADATA = [];
 
-    private $metadata = [];
+    /**
+     * 加载结构元数据
+     */
+    public static function loadMeatData()
+    {
+        if (0 === count(self::$GLOBAL_METADATA)) {
+            self::loadCacheFile();
+        }
+        if (isset(self::$GLOBAL_METADATA[static::class])) {
+            return;
+        }
+        /** @noinspection PhpUnhandledExceptionInspection */
+        self::$GLOBAL_METADATA[static::class] = self::analysisRule();
+    }
 
     /**
      * 自动解析规则
      * @throws ReflectionException
      */
-    protected function loadRule(): void
+    private static function analysisRule(): array
     {
         static $regex = '~@property\s+(?<type>[\w|]+)\s+\$(?<name>[\w]+)\s+(\[(?<control>\w*)\])?~m';
 
-        $ref = new ReflectionClass($this);
+        $ref = new ReflectionClass(static::class);
         $refe = new ReflectionClassExpansion($ref);
         $namespace = $ref->getNamespaceName();
         $useStatements = $refe->getFastUseMapping();
-
         $doc = $ref->getDocComment();
-        $read_olny = [];
+
+        $metadataAttr = [];
+        $metadataReadOnly = [];
         if (preg_match_all($regex, $doc, $match_doc, PREG_SET_ORDER)) {
             foreach ($match_doc as $info) {
                 $name = $info['name'];
@@ -44,51 +59,68 @@ trait StructSupport
                 $control = trim($info['control'] ?? '');
 
                 // 记录元数据
-                $this->metadata[$name] = [
+                $metadataAttr[$name] = [
                     'type' => $info['type'],
                     'realType' => [],
                     'control' => $control,
-                    'isBasicType' => $this->isBasicType($info['type']),
+                    'isBasicType' => self::isBasicType($info['type']),
                 ];
                 // 处理类型定义
                 foreach ($types as $k => $type) {
                     // 统一转换标指类型
-                    $realType = $this->typeConversion($type);
+                    $realType = self::typeConversion($type);
                     // 分析类型是否类
-                    if (false === $isNotClass = $this->isNotClass($realType)) {
-                        $realType = $this->classNameImport($name, $realType, $namespace, $useStatements);
+                    if (false === $isNotClass = self::isNotClass($realType)) {
+                        $realType = self::classNameImport($name, $realType, $namespace, $useStatements);
                     }
-                    $this->metadata[$name]['realType'][$realType] = !$isNotClass;
+                    $metadataAttr[$name]['realType'][$realType] = !$isNotClass;
                 }
 
                 // 属性只读
                 if ('read' === $control) {
-                    $read_olny[$name] = true;
+                    $metadataReadOnly[$name] = true;
                 }
             }
         }
-        $this->read_only_key = $read_olny;
+        return [
+            'hash' => md5_file(__FILE__),
+            self::METADATA_ATTR => $metadataAttr,
+            self::METADATA_READ_ONLY => $metadataReadOnly,
+        ];
     }
 
     /**
-     * @throws ExceptionInterface
+     * 获取元数据
+     * @param string|null $type
+     * @return array
      */
-    public function build()
+    protected function getMetaData(?string $type): array
     {
-        $class_name = static::class;
-        $class_hash = md5_file(__FILE__);
-        $class_data = [
-            'hash' => $class_hash,
-            'metadata' => $this->metadata,
-        ];
+        return self::$GLOBAL_METADATA[static::class][$type];
+    }
 
-        $file = self::$BUILD_PATH . 'struct.php';
+    /**
+     * 加载缓存文件
+     */
+    public static function loadCacheFile(): void
+    {
+        $file = self::$BUILD_PATH . 'struct.dump.php';
+        if (false === is_file($file)) {
+            return;
+        }
         /** @noinspection PhpIncludeInspection */
-        $data = is_file($file) ? require $file : [];
-        $data = is_array($data) ? $data : [];
-        $data[$class_name] = $class_data;
+        $result = require $file;
+        self::$GLOBAL_METADATA = $result ?? [];
+    }
 
-        $content = '<?php' . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL;
+    /**
+     * 保存缓存文件
+     */
+    public static function saveCacheFile()
+    {
+        $file = self::$BUILD_PATH . 'struct.dump.php';
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $content = '<?php' . PHP_EOL . 'return ' . VarExporter::export(self::$GLOBAL_METADATA) . ';' . PHP_EOL;
         file_put_contents($file, $content);
     }
 
@@ -100,7 +132,7 @@ trait StructSupport
      * @param array  $useStatements
      * @return string|null
      */
-    protected function classNameImport(string $name, string $type, string $namespace, array $useStatements)
+    protected static function classNameImport(string $name, string $type, string $namespace, array $useStatements)
     {
         $targetClassNames = [
             $useStatements[$type] ?? null,
@@ -125,7 +157,7 @@ trait StructSupport
      * @return string
      * @link https://www.php.net/manual/en/language.types.php
      */
-    protected function typeConversion(string $type)
+    protected static function typeConversion(string $type)
     {
         switch ($type) {
             case 'bool':
@@ -168,7 +200,7 @@ trait StructSupport
      * @param string $type
      * @return bool
      */
-    protected function isNotClass(string $type)
+    protected static function isNotClass(string $type)
     {
         static $types = [
             'bool' => 0,
@@ -192,7 +224,7 @@ trait StructSupport
      * @param string $type
      * @return bool
      */
-    protected function isBasicType(string $type)
+    protected static function isBasicType(string $type)
     {
         static $types = [
             'bool' => 0,
@@ -214,9 +246,9 @@ trait StructSupport
      * @throws Exception
      * @link https://www.php.net/manual/zh/language.types.php
      */
-    public function typeCheck($name, $inputValue): bool
+    public function typeCheck($name, &$inputValue): bool
     {
-        $info = $this->metadata[$name] ?? null;
+        $info = $this->getMetaData(self::METADATA_ATTR)[$name] ?? null;
         if (null === $info) {
             return false;
         }
@@ -257,7 +289,10 @@ trait StructSupport
                         $result = is_int($inputValue);
                         break;
                     case 'float':
-                        $result = is_float($inputValue);
+                        $result = is_float($inputValue) || $conversion = is_int($inputValue);
+                        if (isset($conversion) && $conversion) {
+                            $inputValue = (float) $inputValue;
+                        }
                         break;
                     case 'string':
                         $result = is_string($inputValue);

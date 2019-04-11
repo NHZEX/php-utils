@@ -7,6 +7,7 @@ use HZEX\UnitConvertor\RenMinBi;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+StructTest::$BUILD_PATH = '../runtime/';
 $obj = new StructTest([]);
 
 var_dump($obj->getDataChangeCount());
@@ -23,15 +24,14 @@ var_dump($obj->expire_time);
 var_dump($obj->getDataChangeCount());
 $obj->erase('expire_time');
 var_dump($obj->getDataChangeCount());
-$obj->expire_time = 123;
+$obj->expire_time = 123.11;
 var_dump($obj->expire_time);
 var_dump($obj->getDataChangeCount());
 $obj->expire_time = 123;
 var_dump($obj->expire_time);
 var_dump($obj->getDataChangeCount());
 
-StructTest::$BUILD_PATH = '../runtime/';
-$obj->build();
+$obj->saveCacheFile();
 
 //$ref = new ReflectionClass($obj);
 //$refe = new ReflectionClassExpansion($ref);

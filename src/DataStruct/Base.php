@@ -22,16 +22,19 @@ class Base implements ArrayAccess, JsonSerializable
 {
     use StructSupport;
 
+    protected const METADATA_ATTR = 'attr';
+    protected const METADATA_READ_ONLY = 'readOnly';
+
     /** @var array|iterable */
     protected $property_data = [];
     protected $original_data = [];
 
     private $hidden_key = [];
-    private $read_only_key = [];
     private $change_count = 0;
 
     public function __construct(iterable $data = [])
     {
+        self::loadMeatData();
         $this->property_data = (array) $data;
         $this->initialize();
     }
@@ -46,12 +49,13 @@ class Base implements ArrayAccess, JsonSerializable
 
     /**
      * 设置只读属性
+     * @deprecated
      * @param array $keys
      * @return Base
      */
     protected function setReadProperty(array $keys): self
     {
-        $this->read_only_key = array_flip($keys);
+        self::$GLOBAL_METADATA[self::METADATA_READ_ONLY] = array_flip($keys);
         return $this;
     }
 
@@ -141,11 +145,11 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function __set(string $name, $value): void
     {
-        if (isset($this->read_only_key[$name]) && isset($this->property_data[$name])) {
+        if (isset($this->getMetaData(self::METADATA_READ_ONLY)[$name]) && isset($this->property_data[$name])) {
             throw new Exception(static::class . '::' . $name . ' read only');
         }
         $this->typeCheck($name, $value);
-        $info = $this->metadata[$name] ?? null;
+        $info = $this->getMetaData(self::METADATA_ATTR)[$name] ?? null;
         if ($info
             && $info['isBasicType']
             && isset($this->property_data[$name])
@@ -175,7 +179,7 @@ class Base implements ArrayAccess, JsonSerializable
      */
     public function __unset($name): void
     {
-        if (isset($this->read_only_key[$name])) {
+        if (isset($this->getMetaData(self::METADATA_READ_ONLY)[$name])) {
             throw new Exception(static::class . 'property' . $name . " read only");
         }
         unset($this->property_data[$name]);
