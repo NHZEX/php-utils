@@ -2,7 +2,7 @@
 
 namespace HZEX\Stub;
 
-class EmptyClassAb extends EmptyClassA
+class EmptyClassAb extends EmptyClassA implements EmptyInterface
 {
 
 }

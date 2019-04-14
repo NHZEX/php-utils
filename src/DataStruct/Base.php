@@ -16,7 +16,6 @@ use ReflectionException;
 /**
  * Class Base2
  * @package struct
- * TODO 需要做单元测试
  */
 class Base implements ArrayAccess, JsonSerializable
 {

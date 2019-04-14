@@ -21,7 +21,7 @@ class StructTest extends TestCase
     }
 
     /**
-     * 测试结构构造
+     * 测试结构构造初始赋值
      */
     public function testConstruct()
     {
@@ -58,8 +58,24 @@ class StructTest extends TestCase
         $struct->dateTime = new DateTime();
         $struct->myClass = new EmptyClassA();
         $struct->myClass = new EmptyClassAb(); // 继承测试
+        $struct->myInter = new EmptyClassAb(); // 接口测试
 
         $this->assertNotEmpty($struct->toArray());
+    }
+
+    /**
+     * 测试更改计数
+     */
+    public function testDataChangeCount()
+    {
+        $struct = new StructBaseTest();
+        $this->assertEquals(0, $struct->getDataChangeCount());
+        $struct->int = 1;
+        $struct->int = 2;
+        $struct->int = 2;
+        $this->assertEquals(2, $struct->getDataChangeCount());
+        $struct->int = 3;
+        $this->assertEquals(3, $struct->getDataChangeCount());
     }
 
     /**
@@ -104,6 +120,4 @@ class StructTest extends TestCase
             [new DateTime()],
         ];
     }
-
-
 }
