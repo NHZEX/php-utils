@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace HZEX\DataStruct;
 
 use ArrayAccess;
-use Exception;
 use JsonSerializable;
+use ReflectionException;
 
 /**
  * Class Base2
@@ -35,6 +35,11 @@ class Base implements ArrayAccess, JsonSerializable
     private $hiddenKey = [];
     private $changeCount = 0;
 
+    /**
+     * @noinspection PhpDocMissingThrowsInspection
+     * Base constructor.
+     * @param iterable $data
+     */
     public function __construct(iterable $data = [])
     {
         // 加载规则
@@ -149,16 +154,16 @@ class Base implements ArrayAccess, JsonSerializable
      * 设置一个属性值
      * @param string $name
      * @param mixed  $value
-     * @throws Exception
+     * @throws ReflectionException
      */
     public function __set(string $name, $value): void
     {
         if (isset($this->getMetaData(self::METADATA_READ_ONLY)[$name]) && isset($this->propertyData[$name])) {
-            throw new Exception(static::class . '->$' . $name . ' Read only');
+            throw new StructReadOnlyException(static::class . '->$' . $name . ' Read only');
         }
         $attrInfo = $this->getMetaData(self::METADATA_ATTR)[$name] ?? null;
         if ($this->strictMode && null === $attrInfo) {
-            throw new Exception(static::class . '->$' . $name . ' Undefined');
+            throw new StructUndefinedException(static::class . '->$' . $name . ' Undefined');
         }
         $this->typeCheck($name, $value);
         if ($attrInfo
@@ -186,12 +191,11 @@ class Base implements ArrayAccess, JsonSerializable
     /**
      * 销毁一个属性值
      * @param string $name
-     * @throws Exception
      */
     public function __unset($name): void
     {
         if (isset($this->getMetaData(self::METADATA_READ_ONLY)[$name])) {
-            throw new Exception(static::class . '->$' . $name . ' Read only');
+            throw new StructReadOnlyException(static::class . '->$' . $name . ' Read only');
         }
         unset($this->propertyData[$name]);
     }
@@ -225,7 +229,7 @@ class Base implements ArrayAccess, JsonSerializable
      * @param mixed $offset
      * @param mixed $value
      * @return void
-     * @throws Exception
+     * @throws ReflectionException
      * @since 5.0.0
      */
     public function offsetSet($offset, $value): void
@@ -238,7 +242,6 @@ class Base implements ArrayAccess, JsonSerializable
      * @link  https://php.net/manual/en/arrayaccess.offsetunset.php
      * @param mixed $offset
      * @return void
-     * @throws Exception
      */
     public function offsetUnset($offset): void
     {

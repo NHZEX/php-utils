@@ -2,7 +2,6 @@
 
 namespace HZEX\DataStruct;
 
-use Exception;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
@@ -262,7 +261,6 @@ trait StructSupport
      * @param $inputValue
      * @return bool
      * @throws ReflectionException
-     * @throws Exception
      * @link https://www.php.net/manual/zh/language.types.php
      */
     public function typeCheck($name, &$inputValue): bool
@@ -346,7 +344,7 @@ trait StructSupport
 
         if (true !== $result) {
             $msg = sprintf('属性类型不一致错误 %s，当前类型 %s，目标类型 %s', $name, $currentType, $info['type']);
-            throw new RuntimeException($msg);
+            throw new StructTypeException($msg);
         }
 
         return true;
