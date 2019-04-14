@@ -3,12 +3,12 @@
 namespace Tests\DataStruct;
 
 use HZEX\DataStruct\ReflectionClassExpansion;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionException;
 use StdClass;
-use Tests\Base;
 
-class ReflectionClassExpansionTest extends Base
+class ReflectionClassExpansionTest extends TestCase
 {
     public function analysisSourceProvider()
     {

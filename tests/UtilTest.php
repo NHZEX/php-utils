@@ -3,8 +3,9 @@
 namespace Tests;
 
 use HZEX\Util;
+use PHPUnit\Framework\TestCase;
 
-class UtilTest extends Base
+class UtilTest extends TestCase
 {
 
     /**

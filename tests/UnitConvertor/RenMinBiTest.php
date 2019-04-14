@@ -3,9 +3,9 @@
 namespace Tests\UnitConvertor;
 
 use HZEX\UnitConvertor\RenMinBi;
-use Tests\Base;
+use PHPUnit\Framework\TestCase;
 
-class RenMinBiTest extends Base
+class RenMinBiTest extends TestCase
 {
     public function fenToYuanProvider()
     {
