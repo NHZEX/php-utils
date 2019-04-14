@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\DataStruct;
+namespace HZEX\Tests\DataStruct;
 
 use HZEX\DataStruct\ReflectionClassExpansion;
 use PHPUnit\Framework\TestCase;
@@ -36,19 +36,19 @@ SOURCE;
         $a1 = [
             [
                 'class' => 'HZEX\\DataStruct\\Base',
-                'alias' => 'HZEX\\DataStruct\\Base',
+                'alias' => null,
             ], [
                 'class' => 'HZEX\\DataStruct\\ExtendedReflectionClass',
                 'alias' => 'Execccc1',
             ], [
                 'class' => 'HZEX\\UnitConvertor\\RenMinBi',
-                'alias' => 'HZEX\\UnitConvertor\\RenMinBi',
+                'alias' => null,
             ], [
                 'class' => 'HZEX\\Util',
                 'alias' => 'Execccc2',
             ], [
                 'class' => 'HZEX\\DataStruct\\BaseProperty',
-                'alias' => 'HZEX\\DataStruct\\BaseProperty',
+                'alias' => null,
             ], [
                 'class' => 'HZEX\\DataStruct\\ExtendedReflectionClass',
                 'alias' => 'Execccc3',
@@ -57,7 +57,7 @@ SOURCE;
                 'alias' => 'Execccc5',
             ], [
                 'class' => 'DeepCopy\\Filter\\Doctrine\\DoctrineEmptyCollectionFilter',
-                'alias' => 'DeepCopy\\Filter\\Doctrine\\DoctrineEmptyCollectionFilter',
+                'alias' => null,
             ],
         ];
         return [

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\UnitConvertor;
+namespace HZEX\Tests\UnitConvertor;
 
 use HZEX\UnitConvertor\RenMinBi;
 use PHPUnit\Framework\TestCase;

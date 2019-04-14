@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace HZEX\Tests;
 
 use HZEX\Util;
 use PHPUnit\Framework\TestCase;
