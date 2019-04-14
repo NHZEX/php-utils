@@ -12,6 +12,7 @@
     "require": {
         "php": "~7.1",
         "ext-bcmath": "*",
+        "ext-fileinfo": "*",
         "ext-json": "*",
         "ext-posix": "*",
         "symfony/var-exporter": "^4.2"
