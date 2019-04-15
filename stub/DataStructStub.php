@@ -10,10 +10,10 @@ class DataStructStub extends DataStruct
     public $bool = false;
     /** @var ?int 整数值 */
     public $int = null;
-    /** @var float 浮点数 */
+    /** @var float {hide} 浮点数 */
     public $float = 1.1;
-    /** @var string 字符串 */
+    /** @var string {read} 字符串 */
     public $string = '1\'23';
-    /** @var array 数组 */
+    /** @var array {read,hide} 数组 */
     public $array = [];
 }

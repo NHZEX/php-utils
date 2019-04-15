@@ -7,8 +7,6 @@ use ReflectionException;
 /**
  * Class DataStruct
  * @package HZEX\DataStruct
- * TODO 输出隐藏
- * TODO 只读控制
  */
 class DataStruct
 {
@@ -21,6 +19,9 @@ class DataStruct
 
     private const METADATA_PROP = 'prop';
     private const METADATA_HASH = 'hash';
+
+    private $isHideProps = [];
+    private $isReadProps = [];
 
     /** @var array */
     private $propertyData = [];
@@ -48,6 +49,10 @@ class DataStruct
      */
     public function toArray()
     {
+        // 过滤隐藏值输出属性
+        if (count($this->isHideProps)) {
+            return array_diff_key($this->propertyData, $this->isHideProps);
+        }
         return $this->propertyData;
     }
 
@@ -92,7 +97,12 @@ class DataStruct
      */
     public function __set(string $name, $value)
     {
-        $attrInfo = $this->getMetaData()->props[$name] ?? null;
+        if (isset($this->isReadProps[$name]) && isset($this->propertyData[$name])) {
+            throw new StructReadOnlyException(static::class . '->$' . $name . ' Only Read');
+        }
+        if (null === ($attrInfo = $this->getMetaData()->props[$name] ?? null)) {
+            throw new StructUndefinedException(static::class . '->$' . $name . ' Undefined');
+        }
         $this->typeCheck($name, $value);
 
         if ($attrInfo
@@ -111,9 +121,9 @@ class DataStruct
      */
     public function __unset($name): void
     {
-//        if (isset($this->getMetaData()->props[$name])) {
-//            throw new StructReadOnlyException(static::class . '->$' . $name . ' Read only');
-//        }
+        if (isset($this->isReadProps[$name])) {
+            throw new StructReadOnlyException(static::class . '->$' . $name . ' Only Read');
+        }
         unset($this->propertyData[$name]);
     }
 

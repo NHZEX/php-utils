@@ -27,7 +27,7 @@ trait DataStructSupport
      */
     public static function loadCacheFile(): void
     {
-        $file = self::$BUILD_PATH . 'struct.dump.php--';
+        $file = self::$BUILD_PATH . 'struct.dump.php';
         if (false === is_file($file)) {
             return;
         }
@@ -95,6 +95,7 @@ trait DataStructSupport
             $propType = $propDocArr['type'];
             $propValue = $propDefaultValues[$propName];
             $propControl = $propDocArr['control'];
+            $propControlArr = array_flip(array_map('trim', explode(',', $propControl)));
 
             // 分析类是否可空
             if ($canNull = ($propType && $propType[0] === '?')) {
@@ -115,6 +116,8 @@ trait DataStructSupport
             $mProp->type = $propType;
             $mProp->realType = $realType;
             $mProp->control = $propControl;
+            $mProp->isHide = isset($propControlArr['hide']);
+            $mProp->isRead = isset($propControlArr['read']);
             $mProp->canNull = $canNull;
             $mProp->isBasicType = self::isBasicType($propType);
             $mProp->isNotClass = self::isNotClass($propType);
@@ -134,12 +137,14 @@ trait DataStructSupport
         foreach ($meta->props as $propName => $propInfo) {
             unset($this->$propName);
             $this->__set($propName, $propInfo->defaultValue);
+            $propInfo->isHide && $this->isHideProps[$propName] = true;
+            $propInfo->isRead && $this->isReadProps[$propName] = true;
         }
     }
 
     private static function parseDoc(string $doc): ?array
     {
-        static $regex = '~@var\s+([\?\w]+)\s+(?:\[(\w*)\])?~';
+        static $regex = '~@var\s+([\?\w]+)\s+(?:\{([,\w]*)})?~';
         if (preg_match_all($regex, $doc, $match, PREG_SET_ORDER)) {
             $match = $match[0];
             return [

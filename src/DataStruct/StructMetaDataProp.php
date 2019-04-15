@@ -11,6 +11,10 @@ class StructMetaDataProp
     /** @var string */
     public $control;
     /** @var bool */
+    public $isRead;
+    /** @var bool */
+    public $isHide;
+    /** @var bool */
     public $canNull;
     /** @var bool */
     public $isBasicType;
