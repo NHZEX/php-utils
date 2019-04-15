@@ -2,18 +2,45 @@
 
 namespace HZEX\Stub;
 
+use Closure;
+use DateTime;
 use HZEX\DataStruct\DataStruct;
+use stdClass;
 
 class DataStructStub extends DataStruct
 {
     /** @var bool 布尔值 */
-    public $bool = false;
-    /** @var ?int 整数值 */
-    public $int = null;
-    /** @var float {hide} 浮点数 */
-    public $float = 1.1;
-    /** @var string {read} 字符串 */
-    public $string = '1\'23';
-    /** @var array {read,hide} 数组 */
-    public $array = [];
+    public $bool;
+    /** @var int 整数值 */
+    public $int;
+    /** @var float 浮点数 */
+    public $float;
+    /** @var string 字符串 */
+    public $string;
+    /** @var array 数组 */
+    public $array;
+    /** @var iterable 可枚举 */
+    public $iterable;
+    /** @var object 任意对象 */
+    public $object;
+    // /** @var callable 匿名函数*/
+    // public $callable;
+    /** @var Closure 匿名函数类 */
+    public $closure;
+    /** @var resource 任意资源 */
+    public $resource;
+    /** @var mixed 任意类型值 */
+    public $mixed;
+    /** @var stdClass 系统类测试1 */
+    public $stdClass;
+    /** @var DateTime 系统类测试2 */
+    public $dateTime;
+    /** @var EmptyClassA 自定义类测试 */
+    public $myClass;
+    /** @var EmptyInterface 自定义接口测试 */
+    public $myInterface;
+    /** @var int {read} 只读测试 */
+    public $readTest;
+    /** @var int {hide} 输出隐藏测试 */
+    public $hideTest;
 }

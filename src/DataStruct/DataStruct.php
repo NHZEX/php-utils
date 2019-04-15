@@ -7,6 +7,7 @@ use ReflectionException;
 /**
  * Class DataStruct
  * @package HZEX\DataStruct
+ * @link https://wiki.php.net/rfc/typed_properties_v2
  */
 class DataStruct
 {
@@ -17,9 +18,6 @@ class DataStruct
     /** @var StructMetaData[] */
     private static $GLOBAL_METADATA = [];
 
-    private const METADATA_PROP = 'prop';
-    private const METADATA_HASH = 'hash';
-
     private $isHideProps = [];
     private $isReadProps = [];
 
@@ -28,10 +26,18 @@ class DataStruct
     /** @var int */
     private $changeCount = 0;
 
-    public function __construct()
+    /**
+     * DataStruct constructor.
+     * @param iterable $iterable
+     */
+    public function __construct(iterable $iterable = [])
     {
         self::loadMeatData();
         $this->initialStruct();
+
+        foreach ($iterable as $key => $value) {
+            $this->$key = $value;
+        }
     }
 
     /**
@@ -103,8 +109,18 @@ class DataStruct
         if (null === ($attrInfo = $this->getMetaData()->props[$name] ?? null)) {
             throw new StructUndefinedException(static::class . '->$' . $name . ' Undefined');
         }
-        $this->typeCheck($name, $value);
+        // 兼容初始值为Null
+        if ($attrInfo->defaultValue === null
+            && $value === null
+            && (!isset($this->propertyData[$name]) || $this->propertyData[$name] === null)
+        ) {
+            $this->propertyData[$name] = null;
+            return;
+        }
+        // 类型检查
+        $this->typeCheck($attrInfo, $name, $value);
 
+        // 一致性检查
         if ($attrInfo
             && isset($this->propertyData[$name])
             && $this->propertyData[$name] === $value
@@ -113,6 +129,7 @@ class DataStruct
             return;
         }
         $this->propertyData[$name] = $value;
+        $this->dataChange();
     }
 
     /**

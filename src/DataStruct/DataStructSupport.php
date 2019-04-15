@@ -27,6 +27,7 @@ trait DataStructSupport
      */
     public static function loadCacheFile(): void
     {
+        // TODO 支持校验缓存文件是否合法
         $file = self::$BUILD_PATH . 'struct.dump.php';
         if (false === is_file($file)) {
             return;
@@ -207,6 +208,10 @@ trait DataStructSupport
             case 'callback':
                 $result = 'callable';
                 break;
+            case '':
+            case 'mixed':
+                $result = 'mixed';
+                break;
             case 'string':
             case 'array':
             case 'iterable':
@@ -234,7 +239,8 @@ trait DataStructSupport
             'iterable' => 0,
             'object' => 0,
             'resource' => 0,
-            'callable' => 0,
+            // 'callable' => 0, // 不应该提供支持 https://wiki.php.net/rfc/typed_properties_v2
+            'mixed' => 0,
         ];
 
         return isset($types[$type]);
@@ -259,26 +265,26 @@ trait DataStructSupport
 
     /**
      * 类型检查
-     * @param $name
-     * @param $inputValue
+     * @param StructMetaDataProp|null $propInfo
+     * @param string                  $name
+     * @param                         $inputValue
      * @return bool
      * @throws ReflectionException
      * @link https://www.php.net/manual/zh/language.types.php
      */
-    public function typeCheck($name, &$inputValue): bool
+    public function typeCheck(?StructMetaDataProp $propInfo, string $name, &$inputValue): bool
     {
-        $result = null;
-        $info = $this->getMetaData()->props[$name] ?? null;
-        if (null === $info) {
+        if (null === $propInfo) {
             return false;
         }
+        $result = null;
 
-        $targetType = $info->realType;
+        $targetType = $propInfo->realType;
         $currentType = gettype($inputValue);
 
-        if ($info->canNull && $inputValue === null) {
+        if ($propInfo->canNull && $inputValue === null) {
             $result = true;
-        } elseif (!$info->isNotClass && is_object($inputValue)) {
+        } elseif (!$propInfo->isNotClass && is_object($inputValue)) {
             // 实例类反射
             $targetRef = new ReflectionClass($targetType);
             $valueRef = new ReflectionClass($inputValue);
@@ -341,7 +347,7 @@ trait DataStructSupport
         }
 
         if (true !== $result) {
-            $msg = sprintf('属性类型不一致错误 %s，当前类型 %s，目标类型 %s', $name, $currentType, $info->type);
+            $msg = sprintf('属性类型不一致错误 %s，当前类型 %s，目标类型 %s', $name, $currentType, $propInfo->type);
             throw new StructTypeException($msg);
         }
 
