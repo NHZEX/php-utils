@@ -17,6 +17,8 @@ class StructMetaDataProp
     /** @var bool */
     public $canNull;
     /** @var bool */
+    public $isTypeArray;
+    /** @var bool */
     public $isBasicType;
     /** @var bool */
     public $isNotClass;

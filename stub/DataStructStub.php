@@ -39,6 +39,10 @@ class DataStructStub extends DataStruct
     public $myClass;
     /** @var EmptyInterface 自定义接口测试 */
     public $myInterface;
+    /** @var int[] 类型数组1 */
+    public $myArray1;
+    /** @var DateTime[] 类型数组2 */
+    public $myArray2;
     /** @var int {read} 只读测试 */
     public $readTest;
     /** @var int {hide} 输出隐藏测试 */

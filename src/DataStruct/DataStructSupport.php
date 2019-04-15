@@ -98,11 +98,16 @@ trait DataStructSupport
             $propControl = $propDocArr['control'];
             $propControlArr = array_flip(array_map('trim', explode(',', $propControl)));
 
+            $canNull = false;
+            $isTypeArray = false;
+
             // 分析类是否可空
             if ($canNull = ($propType && $propType[0] === '?')) {
                 $propType = substr($propType, 1);
-            } else {
-                $canNull = false;
+            }
+            // 分析类型数组
+            if ($isTypeArray = ($propType && strlen($propType) >= 2 && substr($propType, -2) === '[]')) {
+                $propType = substr($propType, 0, -2);
             }
             $realType = self::typeConversion($propType);
 
@@ -120,6 +125,7 @@ trait DataStructSupport
             $mProp->isHide = isset($propControlArr['hide']);
             $mProp->isRead = isset($propControlArr['read']);
             $mProp->canNull = $canNull;
+            $mProp->isTypeArray = $isTypeArray;
             $mProp->isBasicType = self::isBasicType($propType);
             $mProp->isNotClass = self::isNotClass($propType);
             $mProp->defaultValue = $propValue;
@@ -145,7 +151,7 @@ trait DataStructSupport
 
     private static function parseDoc(string $doc): ?array
     {
-        static $regex = '~@var\s+([\?\w]+)\s+(?:\{([,\w]*)})?~';
+        static $regex = '~@var\s+([\?\[\]\w]+)\s+(?:\{([,\w]*)})?~';
         if (preg_match_all($regex, $doc, $match, PREG_SET_ORDER)) {
             $match = $match[0];
             return [
@@ -284,66 +290,17 @@ trait DataStructSupport
 
         if ($propInfo->canNull && $inputValue === null) {
             $result = true;
-        } elseif (!$propInfo->isNotClass && is_object($inputValue)) {
-            // 实例类反射
-            $targetRef = new ReflectionClass($targetType);
-            $valueRef = new ReflectionClass($inputValue);
-
-            // 获取类型
-            $currentType = $valueRef->getName();
-
-            // 如果目标是接口，则判断当前值是否实现该接口
-            if ($targetRef->isInterface()
-                && $valueRef->implementsInterface($targetRef)
-            ) {
-                $result = true;
-            }
-
-            // 如果目标是类，则先判断类是否一致，在判断类是否包含
-            if ($targetRef->getName() === $currentType
-                || $valueRef->isSubclassOf($targetRef->getName())
-            ) {
-                $result = true;
+        } elseif ($propInfo->isTypeArray) {
+            if (is_array($inputValue)) {
+                foreach ($inputValue as &$value) {
+                    $result = $this->typeConsistent($propInfo, $targetType, $currentType, $value);
+                    if (true !== $result) {
+                        break;
+                    }
+                }
             }
         } else {
-            switch ($targetType) {
-                case 'bool':
-                    $result = is_bool($inputValue);
-                    break;
-                case 'int':
-                    $result = is_int($inputValue);
-                    break;
-                case 'float':
-                    $result = is_float($inputValue) || $conversion = is_int($inputValue);
-                    if (isset($conversion) && $conversion) {
-                        $inputValue = (float) $inputValue;
-                    }
-                    break;
-                case 'string':
-                    $result = is_string($inputValue);
-                    break;
-                case 'array':
-                    $result = is_array($inputValue);
-                    break;
-                case 'iterable':
-                    $result = is_iterable($inputValue);
-                    break;
-                case 'object':
-                    $result = is_object($inputValue);
-                    break;
-                case 'resource':
-                    $result = is_resource($inputValue);
-                    break;
-                case 'null':
-                    $result = is_null($inputValue);
-                    break;
-                case 'callable':
-                    $result = is_callable($inputValue);
-                    break;
-                case 'mixed':
-                    $result = true;
-                    break;
-            }
+            $result = $this->typeConsistent($propInfo, $targetType, $currentType, $inputValue);
         }
 
         if (true !== $result) {
@@ -352,5 +309,108 @@ trait DataStructSupport
         }
 
         return true;
+    }
+
+    /**
+     * @param StructMetaDataProp $propInfo
+     * @param string             $targetType
+     * @param string             $currentType
+     * @param                    $inputValue
+     * @return bool|null
+     * @throws ReflectionException
+     */
+    private function typeConsistent(
+        StructMetaDataProp $propInfo,
+        string $targetType,
+        string &$currentType,
+        &$inputValue
+    ) {
+        if (!$propInfo->isNotClass && is_object($inputValue)) {
+            $result = $this->isClassType($targetType, $currentType, $inputValue);
+        } else {
+            $result = $this->isInternalType($targetType, $inputValue);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $targetType
+     * @param string $currentType
+     * @param        $inputValue
+     * @return bool|null
+     * @throws ReflectionException
+     */
+    private function isClassType(string $targetType, string &$currentType, &$inputValue)
+    {
+        $result = null;
+
+        // 实例类反射
+        $targetRef = new ReflectionClass($targetType);
+        $valueRef = new ReflectionClass($inputValue);
+
+        // 获取类型
+        $currentType = $valueRef->getName();
+
+        // 如果目标是接口，则判断当前值是否实现该接口
+        if ($targetRef->isInterface()
+            && $valueRef->implementsInterface($targetRef)
+        ) {
+            $result = true;
+        }
+
+        // 如果目标是类，则先判断类是否一致，在判断类是否包含
+        if ($targetRef->getName() === $currentType
+            || $valueRef->isSubclassOf($targetRef->getName())
+        ) {
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    private function isInternalType(string $targetType, &$inputValue)
+    {
+        switch ($targetType) {
+            case 'bool':
+                $result = is_bool($inputValue);
+                break;
+            case 'int':
+                $result = is_int($inputValue);
+                break;
+            case 'float':
+                $result = is_float($inputValue) || $conversion = is_int($inputValue);
+                if (isset($conversion) && $conversion) {
+                    $inputValue = (float)$inputValue;
+                }
+                break;
+            case 'string':
+                $result = is_string($inputValue);
+                break;
+            case 'array':
+                $result = is_array($inputValue);
+                break;
+            case 'iterable':
+                $result = is_iterable($inputValue);
+                break;
+            case 'object':
+                $result = is_object($inputValue);
+                break;
+            case 'resource':
+                $result = is_resource($inputValue);
+                break;
+            case 'null':
+                $result = is_null($inputValue);
+                break;
+            case 'callable':
+                $result = is_callable($inputValue);
+                break;
+            case 'mixed':
+                $result = true;
+                break;
+            default:
+                $result = null;
+        }
+        return $result;
     }
 }

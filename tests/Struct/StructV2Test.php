@@ -70,6 +70,39 @@ class StructV2Test extends TestCase
         $this->assertNotEmpty($struct->toArray());
     }
 
+    public function testTypeArray()
+    {
+        $struct = new DataStructStub();
+        $struct->myArray1 = [1, 2, 3];
+        $struct->myArray2 = [
+            new DateTime(),
+            new DateTime(),
+            new DateTime(),
+        ];
+
+        $this->assertNotEmpty($struct->toArray());
+    }
+
+    /**
+     * @dataProvider typeArrayCheckProvider
+     * @param $key
+     * @param $value
+     */
+    public function testTypeArrayCheck($key, $value)
+    {
+        $this->expectException(StructTypeException::class);
+        $struct = new DataStructStub();
+        $struct->$key = $value;
+    }
+
+    public function typeArrayCheckProvider()
+    {
+        return [
+            ['myArray1', [1, '12', 3]],
+            ['myArray2', [new DateTime(), new stdClass()]],
+        ];
+    }
+
     /**
      * 测试更改计数
      */
