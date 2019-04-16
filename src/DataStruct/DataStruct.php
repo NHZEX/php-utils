@@ -2,6 +2,8 @@
 
 namespace HZEX\DataStruct;
 
+use ArrayAccess;
+use JsonSerializable;
 use ReflectionException;
 
 /**
@@ -9,7 +11,7 @@ use ReflectionException;
  * @package HZEX\DataStruct
  * @link https://wiki.php.net/rfc/typed_properties_v2
  */
-class DataStruct
+class DataStruct implements ArrayAccess, JsonSerializable
 {
     use DataStructSupport;
 
