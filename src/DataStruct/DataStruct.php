@@ -40,6 +40,16 @@ class DataStruct implements ArrayAccess, JsonSerializable
         foreach ($iterable as $key => $value) {
             $this->$key = $value;
         }
+
+        $this->initialize();
+    }
+
+    /**
+     * 初始化结构
+     * @return void
+     */
+    protected function initialize(): void
+    {
     }
 
     /**
