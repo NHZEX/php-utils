@@ -15,7 +15,7 @@ trait DataStructSupport
     /**
      * 加载缓存文件
      */
-    private static function loadCacheFile(): void
+    public static function loadCacheFile(): void
     {
         // TODO 支持校验缓存文件是否合法
         $file = self::$BUILD_PATH . self::$DUMP_FILE_NAME;
@@ -32,6 +32,9 @@ trait DataStructSupport
      */
     public static function dumpCacheFile()
     {
+        if (empty(self::$GLOBAL_METADATA)) {
+            return;
+        }
         $file = self::$BUILD_PATH . self::$DUMP_FILE_NAME;
         /** @noinspection PhpUnhandledExceptionInspection */
         $content = '<?php'
