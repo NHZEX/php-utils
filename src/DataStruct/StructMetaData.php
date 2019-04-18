@@ -7,5 +7,7 @@ class StructMetaData
     /** @var StructMetaDataProp[] */
     public $props = [];
     /** @var string */
-    public $hash;
+    public $fileHash;
+    /** @var string */
+    public $filePath;
 }

@@ -6,7 +6,9 @@ use HZEX\Stub\DataStructStub;
 require __DIR__ . '/../vendor/autoload.php';
 //require __DIR__ . '/../vendor/topthink/framework/base.php';
 
-DataStruct::setCacheBuildPath('./../runtime/');
+DataStruct::setProjectRootPath(__DIR__ . '/../');
+DataStruct::setCachePath('./../runtime/');
+DataStruct::setProduce(false);
 
 $struct = new DataStructStub();
 
@@ -17,8 +19,5 @@ $struct->myArray2 = [
     new DateTime(),
     new DateTime(),
 ];
-
-//var_dump($struct->toArray());
-
 
 DataStruct::dumpCacheFile();

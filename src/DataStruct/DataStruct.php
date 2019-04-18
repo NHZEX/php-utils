@@ -15,10 +15,16 @@ abstract class DataStruct implements ArrayAccess, JsonSerializable
 {
     use DataStructSupport;
 
-    /** @var string */
+    /** @var string 根路径 */
+    private static $ROOT_PATH = './';
+    /** @var string 编译路径*/
     private static $BUILD_PATH = './';
+    /** @var string 转存缓存文件名 */
+    private static $DUMP_FILE_NAME = 'struct.dump.php';
     /** @var StructMetaData[] */
     private static $GLOBAL_METADATA = [];
+    /** @var bool 是否调试 */
+    private static $PRODUCE = false;
 
     private $isHideProps = [];
     private $isReadProps = [];
@@ -32,11 +38,50 @@ abstract class DataStruct implements ArrayAccess, JsonSerializable
     protected $ignoreUndefinedException = false;
 
     /**
+     * 设置项目根目录
+     * @param string $path
+     * @return bool
+     */
+    public static function setProjectRootPath(string $path): bool
+    {
+        if (!is_dir($path)) {
+            return false;
+        }
+        self::$ROOT_PATH = realpath($path) . DIRECTORY_SEPARATOR;
+        return true;
+    }
+
+    /**
+     * 设置缓存路径
+     * @param string $path
+     * @return bool
+     */
+    public static function setCachePath(string $path): bool
+    {
+        if (!is_dir($path)) {
+            return false;
+        }
+        self::$BUILD_PATH = realpath($path) . DIRECTORY_SEPARATOR;
+        return true;
+    }
+
+    /**
+     * 启用生产模式
+     * @param bool $produce
+     */
+    public static function setProduce(bool $produce): void
+    {
+        self::$PRODUCE = $produce;
+    }
+
+    /**
+     * @noinspection PhpDocMissingThrowsInspection
      * DataStruct constructor.
      * @param iterable $iterable
      */
     public function __construct(iterable $iterable = [])
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         self::loadMeatData();
         $this->initialStruct();
 

@@ -9,26 +9,15 @@ use RuntimeException;
 
 trait DataStructSupport
 {
-    /**
-     * @param string $path
-     * @return bool
-     */
-    public static function setCacheBuildPath(string $path): bool
-    {
-        if (!is_dir($path)) {
-            return false;
-        }
-        self::$BUILD_PATH = realpath($path) . DIRECTORY_SEPARATOR;
-        return true;
-    }
+    private static $ANALYSIS_CACHE = [];
 
     /**
      * 加载缓存文件
      */
-    public static function loadCacheFile(): void
+    private static function loadCacheFile(): void
     {
         // TODO 支持校验缓存文件是否合法
-        $file = self::$BUILD_PATH . 'struct.dump.php';
+        $file = self::$BUILD_PATH . self::$DUMP_FILE_NAME;
         if (false === is_file($file)) {
             return;
         }
@@ -42,11 +31,11 @@ trait DataStructSupport
      */
     public static function dumpCacheFile()
     {
-        $file = self::$BUILD_PATH . 'struct.dump.php';
+        $file = self::$BUILD_PATH . self::$DUMP_FILE_NAME;
         /** @noinspection PhpUnhandledExceptionInspection */
         $content = '<?php'
             . PHP_EOL
-            . 'return unserialize('
+            . 'return \unserialize('
             . var_export(serialize(self::$GLOBAL_METADATA), true)
             . ');'
             . PHP_EOL;
@@ -55,17 +44,53 @@ trait DataStructSupport
 
     /**
      * 加载结构元数据
+     * @return void
+     * @throws ReflectionException
      */
-    public static function loadMeatData()
+    private static function loadMeatData(): void
     {
         if (0 === count(self::$GLOBAL_METADATA)) {
             self::loadCacheFile();
         }
-        if (isset(self::$GLOBAL_METADATA[static::class])) {
+
+        if (self::validMetaDataCache()) {
             return;
         }
+
         /** @noinspection PhpUnhandledExceptionInspection */
         self::$GLOBAL_METADATA[static::class] = self::analysisStruct();
+        self::$ANALYSIS_CACHE[static::class] = true;
+    }
+
+    /**
+     * 检测元数据是否有效
+     * @return bool
+     */
+    private static function validMetaDataCache(): bool
+    {
+        if (false === isset(self::$GLOBAL_METADATA[static::class])) {
+            return false;
+        }
+
+        if (true === isset(self::$ANALYSIS_CACHE[static::class])) {
+            return true;
+        }
+
+        if (true === self::$PRODUCE) {
+            return true;
+        }
+
+        /** @var StructMetaData $meta */
+        $meta = self::$GLOBAL_METADATA[static::class];
+        $filePath = self::$ROOT_PATH . $meta->filePath;
+
+        // 测试文件是否有效
+        if (true === is_file($filePath)
+            && sha1_file($filePath) === $meta->fileHash
+        ) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -83,7 +108,14 @@ trait DataStructSupport
      */
     private static function analysisStruct(): StructMetaData
     {
+        $metadata = new StructMetaData();
+
         $ref = new ReflectionClass(static::class);
+        $classFilePath = $ref->getFileName();
+        $classFileRelativePath = substr($classFilePath, strlen(self::$ROOT_PATH));
+        $metadata->filePath = $classFileRelativePath;
+        $metadata->fileHash = sha1_file(self::$ROOT_PATH . $classFileRelativePath);
+
         $namespace = $ref->getNamespaceName();
         $refe = new ReflectionClassExpansion($ref);
         $useStatements = $refe->getFastUseMapping();
@@ -132,8 +164,6 @@ trait DataStructSupport
             $propMetadata[$propName] = $mProp;
         }
 
-        $metadata = new StructMetaData();
-        $metadata->hash = sha1_file($ref->getFileName());
         $metadata->props = $propMetadata ?? [];
         return $metadata;
     }
@@ -169,7 +199,7 @@ trait DataStructSupport
      * @param array  $useStatements
      * @return string|null
      */
-    protected static function classImport(string $type, string $namespace, array $useStatements): ?string
+    private static function classImport(string $type, string $namespace, array $useStatements): ?string
     {
         $targetClassNames = [
             $useStatements[$type] ?? null,
@@ -194,7 +224,7 @@ trait DataStructSupport
      * @return string
      * @link https://www.php.net/manual/en/language.types.php
      */
-    protected static function typeConversion(string $type)
+    private static function typeConversion(string $type)
     {
         switch ($type) {
             case 'bool':
@@ -234,7 +264,7 @@ trait DataStructSupport
      * @param string $type
      * @return bool
      */
-    protected static function isNotClass(string $type)
+    private static function isNotClass(string $type)
     {
         static $types = [
             'bool' => 0,
@@ -257,7 +287,7 @@ trait DataStructSupport
      * @param string $type
      * @return bool
      */
-    protected static function isBasicType(string $type)
+    private static function isBasicType(string $type)
     {
         static $types = [
             'bool' => 0,
@@ -278,7 +308,7 @@ trait DataStructSupport
      * @throws ReflectionException
      * @link https://www.php.net/manual/zh/language.types.php
      */
-    public function typeCheck(?StructMetaDataProp $propInfo, string $name, &$inputValue): bool
+    private function typeCheck(?StructMetaDataProp $propInfo, string $name, &$inputValue): bool
     {
         if (null === $propInfo) {
             return false;
