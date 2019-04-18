@@ -164,7 +164,10 @@ class StructV2Test extends TestCase
         $data = new DataStructStub();
         $data->setIgnoreUndefinedException(true);
         $data['Undefined'] = null;
+        $data['int'] = 123;
         $this->assertArrayNotHasKey('Undefined', $data);
+        $this->assertArrayHasKey('int', $data);
+        $this->assertEquals(123, $data->int);
     }
 
     /**

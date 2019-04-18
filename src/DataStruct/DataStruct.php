@@ -120,9 +120,10 @@ abstract class DataStruct implements ArrayAccess, JsonSerializable
         if (isset($this->isReadProps[$name]) && isset($this->propertyData[$name])) {
             throw new StructReadOnlyException(static::class . '->$' . $name . ' Only Read');
         }
-        if ($this->ignoreUndefinedException) {
-            return;
-        } elseif (null === ($attrInfo = $this->getMetaData()->props[$name] ?? null)) {
+        if (null === ($attrInfo = $this->getMetaData()->props[$name] ?? null)) {
+            if ($this->ignoreUndefinedException) {
+                return;
+            }
             throw new StructUndefinedException(static::class . '->$' . $name . ' Undefined');
         }
         // 兼容初始值为Null
