@@ -11,7 +11,7 @@ use ReflectionException;
  * @package HZEX\DataStruct
  * @link https://wiki.php.net/rfc/typed_properties_v2
  */
-class DataStruct implements ArrayAccess, JsonSerializable
+abstract class DataStruct implements ArrayAccess, JsonSerializable
 {
     use DataStructSupport;
 
@@ -49,12 +49,10 @@ class DataStruct implements ArrayAccess, JsonSerializable
 
     /**
      * 初始化结构
-     * @param iterable $iterable
+     * @param iterable $input
      * @return void
      */
-    protected function initialize(iterable $iterable): void
-    {
-    }
+    abstract protected function initialize(iterable $input): void;
 
     /**
      * 返回该集合内部原始属性

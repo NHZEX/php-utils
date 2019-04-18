@@ -48,6 +48,15 @@ class DataStructStub extends DataStruct
     /** @var int {hide} 输出隐藏测试 */
     public $hideTest;
 
+    /**
+     * 初始化结构
+     * @param iterable $input
+     * @return void
+     */
+    protected function initialize(iterable $input): void
+    {
+    }
+
     public function setIgnoreUndefinedException(bool $bool)
     {
         $this->ignoreUndefinedException = $bool;

@@ -1,11 +1,12 @@
 <?php
 
+use HZEX\DataStruct\DataStruct;
 use HZEX\Stub\DataStructStub;
 
 require __DIR__ . '/../vendor/autoload.php';
 //require __DIR__ . '/../vendor/topthink/framework/base.php';
 
-//DataStruct::setCacheBuildPath('./../runtime/');
+DataStruct::setCacheBuildPath('./../runtime/');
 
 $struct = new DataStructStub();
 
@@ -20,4 +21,4 @@ $struct->myArray2 = [
 //var_dump($struct->toArray());
 
 
-//DataStruct::dumpCacheFile();
+DataStruct::dumpCacheFile();
