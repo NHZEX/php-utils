@@ -47,4 +47,9 @@ class DataStructStub extends DataStruct
     public $readTest;
     /** @var int {hide} 输出隐藏测试 */
     public $hideTest;
+
+    public function setIgnoreUndefinedException(bool $bool)
+    {
+        $this->ignoreUndefinedException = $bool;
+    }
 }

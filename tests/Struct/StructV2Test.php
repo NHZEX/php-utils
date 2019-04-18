@@ -157,6 +157,17 @@ class StructV2Test extends TestCase
     }
 
     /**
+     * 测试属性未定义异常忽略
+     */
+    public function testStructIgnoreUndefinedException()
+    {
+        $data = new DataStructStub();
+        $data->setIgnoreUndefinedException(true);
+        $data['Undefined'] = null;
+        $this->assertArrayNotHasKey('Undefined', $data);
+    }
+
+    /**
      * 测试类型校验异常
      * @param $value
      * @dataProvider structExceptionProvider

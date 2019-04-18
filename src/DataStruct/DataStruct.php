@@ -28,6 +28,9 @@ class DataStruct implements ArrayAccess, JsonSerializable
     /** @var int */
     private $changeCount = 0;
 
+    /** @var bool */
+    protected $ignoreUndefinedException = false;
+
     /**
      * DataStruct constructor.
      * @param iterable $iterable
@@ -41,14 +44,15 @@ class DataStruct implements ArrayAccess, JsonSerializable
             $this->$key = $value;
         }
 
-        $this->initialize();
+        $this->initialize($iterable);
     }
 
     /**
      * 初始化结构
+     * @param iterable $iterable
      * @return void
      */
-    protected function initialize(): void
+    protected function initialize(iterable $iterable): void
     {
     }
 
@@ -110,7 +114,7 @@ class DataStruct implements ArrayAccess, JsonSerializable
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      * @throws ReflectionException
      */
     public function __set(string $name, $value)
@@ -118,7 +122,9 @@ class DataStruct implements ArrayAccess, JsonSerializable
         if (isset($this->isReadProps[$name]) && isset($this->propertyData[$name])) {
             throw new StructReadOnlyException(static::class . '->$' . $name . ' Only Read');
         }
-        if (null === ($attrInfo = $this->getMetaData()->props[$name] ?? null)) {
+        if ($this->ignoreUndefinedException) {
+            return;
+        } elseif (null === ($attrInfo = $this->getMetaData()->props[$name] ?? null)) {
             throw new StructUndefinedException(static::class . '->$' . $name . ' Undefined');
         }
         // 兼容初始值为Null
