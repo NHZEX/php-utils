@@ -1,6 +1,6 @@
 <?php
 
-namespace HZEX\DataStruct;
+namespace HZEX\DataStruct\Exception;
 
 use RuntimeException;
 

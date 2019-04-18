@@ -3,6 +3,8 @@
 namespace HZEX\DataStruct;
 
 use ArrayAccess;
+use HZEX\DataStruct\Exception\StructReadOnlyException;
+use HZEX\DataStruct\Exception\StructUndefinedException;
 use JsonSerializable;
 use ReflectionException;
 

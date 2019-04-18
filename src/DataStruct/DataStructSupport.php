@@ -2,6 +2,7 @@
 
 namespace HZEX\DataStruct;
 
+use HZEX\DataStruct\Exception\StructTypeException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
@@ -114,7 +115,7 @@ trait DataStructSupport
         $classFilePath = $ref->getFileName();
         $classFileRelativePath = substr($classFilePath, strlen(self::$ROOT_PATH));
         $metadata->filePath = $classFileRelativePath;
-        $metadata->fileHash = sha1_file(self::$ROOT_PATH . $classFileRelativePath);
+        $metadata->fileHash = sha1_file($classFilePath);
 
         $namespace = $ref->getNamespaceName();
         $refe = new ReflectionClassExpansion($ref);

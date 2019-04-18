@@ -4,9 +4,9 @@ namespace HZEX\Tests\Struct;
 
 use Closure;
 use DateTime;
-use HZEX\DataStruct\StructReadOnlyException;
-use HZEX\DataStruct\StructTypeException;
-use HZEX\DataStruct\StructUndefinedException;
+use HZEX\DataStruct\Exception\StructReadOnlyException;
+use HZEX\DataStruct\Exception\StructTypeException;
+use HZEX\DataStruct\Exception\StructUndefinedException;
 use HZEX\Stub\DataStructStub;
 use HZEX\Stub\EmptyClassA;
 use HZEX\Stub\EmptyClassAb;
