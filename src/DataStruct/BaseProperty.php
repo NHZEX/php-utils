@@ -160,4 +160,9 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
     {
         return $this->toArray();
     }
+
+    public function __debugInfo()
+    {
+        return $this->getPublicVars();
+    }
 }
