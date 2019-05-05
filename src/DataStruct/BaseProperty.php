@@ -14,7 +14,7 @@ use JsonSerializable;
 
 abstract class BaseProperty implements ArrayAccess, JsonSerializable
 {
-    protected $hidden_key = [];
+    private $hidden_key = [];
 
     public function __construct(iterable $arr = [])
     {
