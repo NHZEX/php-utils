@@ -103,6 +103,16 @@ class StructV2Test extends TestCase
         $this->assertNotEmpty($struct->toArray());
     }
 
+    public function testChangeArray()
+    {
+        $struct = new DataStructStub();
+        $struct->myArray2 = [];
+        $struct->myArray2[] = 123;
+        $struct['myArray2'][] = 456;
+
+        $this->assertEquals([123, 456], $struct->myArray2);
+    }
+
     /**
      * @dataProvider typeArrayCheckProvider
      * @param $key
@@ -129,13 +139,14 @@ class StructV2Test extends TestCase
     public function testDataChangeCount()
     {
         $struct = new DataStructStub();
-        $this->assertEquals(0, $struct->getDataChangeCount());
+        $initial = $struct->getDataChangeCount();
+        $this->assertEquals(0, $struct->getDataChangeCount() - $initial);
         $struct->int = 1;
         $struct->int = 2;
         $struct->int = 2;
-        $this->assertEquals(2, $struct->getDataChangeCount());
+        $this->assertEquals(2, $struct->getDataChangeCount() - $initial);
         $struct->int = 3;
-        $this->assertEquals(3, $struct->getDataChangeCount());
+        $this->assertEquals(3, $struct->getDataChangeCount() - $initial);
     }
 
     /**

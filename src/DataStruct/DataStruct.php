@@ -152,7 +152,7 @@ abstract class DataStruct implements ArrayAccess, JsonSerializable
      * @param string $name
      * @return mixed
      */
-    public function __get(string $name)
+    public function &__get(string $name)
     {
         return $this->propertyData[$name];
     }
@@ -225,7 +225,7 @@ abstract class DataStruct implements ArrayAccess, JsonSerializable
      * @param mixed $offset
      * @return mixed Can return all value types.
      */
-    public function offsetGet($offset)
+    public function &offsetGet($offset)
     {
         return $this->__get($offset);
     }

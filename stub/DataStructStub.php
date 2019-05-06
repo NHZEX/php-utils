@@ -43,6 +43,8 @@ class DataStructStub extends DataStruct
     public $myArray1;
     /** @var DateTime[] 类型数组2 */
     public $myArray2;
+    /** @var array 初始化数组值测试 */
+    public $initAttay = [1, 2, 3];
     /** @var int {read} 只读测试 */
     public $readTest;
     /** @var int {hide} 输出隐藏测试 */
