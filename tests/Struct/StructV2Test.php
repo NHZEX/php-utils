@@ -43,6 +43,15 @@ class StructV2Test extends TestCase
     }
 
     /**
+     * 测试结构初始化
+     */
+    public function testInitialize()
+    {
+        $struct = new DataStructStub();
+        $this->assertTrue($struct->getTestInitializeValue());
+    }
+
+    /**
      * 测试赋值
      */
     public function testAssignment()

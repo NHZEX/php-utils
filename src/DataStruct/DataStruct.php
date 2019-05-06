@@ -281,4 +281,13 @@ abstract class DataStruct implements ArrayAccess, JsonSerializable
     {
         return $this->changeCount;
     }
+
+    /**
+     * 重写调试信息
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return $this->propertyData;
+    }
 }
