@@ -326,10 +326,14 @@ trait DataStructSupport
             $result = true;
         } elseif ($propInfo->isTypeArray) {
             if (is_array($inputValue)) {
-                foreach ($inputValue as &$value) {
-                    $result = $this->typeConsistent($propInfo, $targetType, $currentType, $value);
-                    if (true !== $result) {
-                        break;
+                if (0 === count($inputValue)) {
+                    $result = true;
+                } else {
+                    foreach ($inputValue as &$value) {
+                        $result = $this->typeConsistent($propInfo, $targetType, $currentType, $value);
+                        if (true !== $result) {
+                            break;
+                        }
                     }
                 }
             }

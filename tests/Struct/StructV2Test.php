@@ -93,6 +93,17 @@ class StructV2Test extends TestCase
     }
 
     /**
+     * 空值测试
+     */
+    public function testTypeArrayEmpty()
+    {
+        $struct = new DataStructStub();
+        $struct->myArray2 = [];
+
+        $this->assertNotEmpty($struct->toArray());
+    }
+
+    /**
      * @dataProvider typeArrayCheckProvider
      * @param $key
      * @param $value
