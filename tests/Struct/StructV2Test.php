@@ -107,8 +107,8 @@ class StructV2Test extends TestCase
     {
         $struct = new DataStructStub();
         $struct->myArray2 = [];
-        $struct->myArray2[] = 123;
-        $struct['myArray2'][] = 456;
+        $struct->refValue('myArray2')[] = 123;
+        $struct->refValue('myArray2')[] = 456;
 
         $this->assertEquals([123, 456], $struct->myArray2);
     }
