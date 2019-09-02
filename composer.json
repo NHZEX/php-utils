@@ -14,7 +14,9 @@
         "ext-bcmath": "*",
         "ext-fileinfo": "*",
         "ext-json": "*",
+        "ext-openssl": "*",
         "ext-posix": "*",
+        "symfony/var-dumper": "^4.3",
         "symfony/var-exporter": "^4.2"
     },
     "require-dev": {
@@ -23,10 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "HZEX\\": "src/"
+            "HZEX\\": "src/",
+            "HuangZx\\": "src/"
         },
         "files": [
-            "src/bootstrap.php"
+            "src/bootstrap.php",
+            "src/debug_helper.php"
         ]
     },
     "autoload-dev": {
