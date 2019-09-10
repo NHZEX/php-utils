@@ -54,6 +54,8 @@ function debug_value($val)
     }
 
     switch (gettype($val)) {
+        case 'array':
+            return debug_array($val);
         case 'resource':
         case 'resource (closed)':
         case 'unknown type':
