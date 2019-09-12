@@ -53,21 +53,16 @@ function debug_value($val)
         $dumper = new CliDumper();
     }
 
-    switch (gettype($val)) {
-        case 'array':
-            return debug_array($val);
-        case 'resource':
-        case 'resource (closed)':
-        case 'unknown type':
-            return $dumper->dump($cloner->cloneVar($val), true);
-        case 'object':
-            if ($val instanceof Closure) {
-                return debug_closure($val, false);
-            }
-            return '\\' . get_class($val) . '#' . spl_object_id($val);
+    if (is_array($val)) {
+        return debug_array($val);
+    } elseif (is_object($val)) {
+        if ($val instanceof Closure) {
+            return debug_closure($val, false);
+        }
+        return '\\' . get_class($val) . '#' . spl_object_id($val);
+    } else {
+        return $dumper->dump($cloner->cloneVar($val), true);
     }
-
-    return $val;
 }
 
 /**
