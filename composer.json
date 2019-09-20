@@ -20,8 +20,7 @@
         "symfony/var-exporter": "^4.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.1",
-        "topthink/framework": "^5.1.35"
+        "phpunit/phpunit": "^8.1"
     },
     "autoload": {
         "psr-4": {
@@ -40,9 +39,6 @@
             "HZEX\\Stub\\": "stub/",
             "Example\\": "example/"
         }
-    },
-    "suggest": {
-        "topthink/framework": "think命令行扩展支持"
     },
     "config": {
         "sort-packages": true,
