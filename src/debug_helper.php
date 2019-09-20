@@ -21,6 +21,24 @@ function set_path_cut_len(?int $clen = null): int
 }
 
 /**
+ * dump 值并以字符串形式返回
+ * @param mixed $val
+ * @return string
+ */
+function dump_value($val): string
+{
+    static $cloner = null;
+    static $dumper = null;
+    if (null === $dumper) {
+        $cloner = new VarCloner();
+        // $cloner->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO); // 用途未知
+        // TODO 使用了外部资源，可能会导致 Swoole 协程兼容问题
+        $dumper = new CliDumper();
+    }
+    return $dumper->dump($cloner->cloneVar($val), true);
+}
+
+/**
  * @param      $data
  * @param bool $display
  * @return mixed
@@ -44,15 +62,6 @@ function debug_array(iterable $data, bool $display = false)
 
 function debug_value($val)
 {
-    static $cloner = null;
-    static $dumper = null;
-    if (null === $dumper) {
-        $cloner = new VarCloner();
-        // $cloner->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO); // 用途未知
-        // TODO 使用了外部资源，可能会导致 Swoole 协程兼容问题
-        $dumper = new CliDumper();
-    }
-
     if (is_array($val)) {
         return debug_array($val);
     } elseif (is_object($val)) {
@@ -61,7 +70,7 @@ function debug_value($val)
         }
         return '\\' . get_class($val) . '#' . spl_object_id($val);
     } else {
-        return $dumper->dump($cloner->cloneVar($val), true);
+        return dump_value($val);
     }
 }
 
@@ -93,4 +102,22 @@ function debug_closure(Closure $object, bool $display = false)
         echo $content;
     }
     return $content;
+}
+
+/**
+ * 调试字符串局部
+ * @param string $str
+ * @param int    $target
+ * @param int    $offset
+ * @return string
+ */
+function debug_string(string $str, int $target, int $offset = 12)
+{
+    $start = max(0, $target - $offset);
+    $end = min(strlen($str), $target + $offset);
+    $length = max(0, $end - $start) + 1;
+    $content = substr($str, $start, $length);
+    $content = $start . '/^' . $content . '$/' . $length;
+
+    return rtrim(dump_value($content));
 }
