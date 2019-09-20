@@ -117,7 +117,7 @@ function debug_string(string $str, int $target, int $offset = 12)
     $end = min(strlen($str), $target + $offset);
     $length = max(0, $end - $start) + 1;
     $content = substr($str, $start, $length);
-    $content = $start . '/^' . $content . '$/' . $length;
+    $content = $start . '/^' . $content . '$/' . $end;
 
     return rtrim(dump_value($content));
 }
