@@ -7,7 +7,6 @@ use ReflectionFunction;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function get_class;
-use function gettype;
 use function spl_object_id;
 use function var_export;
 
@@ -81,23 +80,18 @@ function debug_value($val)
  */
 function debug_closure(Closure $object, bool $display = false)
 {
-    $content = null;
-    if (false === $object instanceof Closure) {
-        $content = 'debug: ' . gettype($object) . PHP_EOL;
-    } else {
-        try {
-            $ref = new ReflectionFunction($object);
-        } catch (ReflectionException $e) {
-            return null;
-        }
-        if ($ref->getClosureThis()) {
-            $thisClass = get_class($ref->getClosureThis());
-        } else {
-            $thisClass = substr($ref->getFileName(), set_path_cut_len());
-        }
-
-        $content = "$thisClass@{$ref->getStartLine()}-{$ref->getEndLine()}\n";
+    try {
+        $ref = new ReflectionFunction($object);
+    } catch (ReflectionException $e) {
+        return null;
     }
+    if ($ref->getClosureThis()) {
+        $thisClass = debug_value($ref->getClosureThis());
+    } else {
+        $thisClass = substr($ref->getFileName(), set_path_cut_len());
+    }
+
+    $content = "$thisClass@{$ref->getStartLine()}-{$ref->getEndLine()}\n";
     if ($display) {
         echo $content;
     }
