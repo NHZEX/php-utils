@@ -11,7 +11,6 @@
     ],
     "require": {
         "php": "~7.1",
-        "ext-bcmath": "*",
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-posix": "*",
@@ -19,7 +18,11 @@
         "symfony/var-exporter": "^4.2"
     },
     "require-dev": {
+        "ext-bcmath": "*",
         "phpunit/phpunit": "^7|^8"
+    },
+    "suggest": {
+        "ext-bcmath": "unit convertor support"
     },
     "autoload": {
         "psr-4": {
