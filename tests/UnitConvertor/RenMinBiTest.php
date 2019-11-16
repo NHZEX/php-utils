@@ -28,6 +28,7 @@ class RenMinBiTest extends TestCase
 
     /**
      * @dataProvider fenToYuanProvider
+     * @requires extension bcmath
      * @param $yuan
      * @param $fen
      */
@@ -38,6 +39,7 @@ class RenMinBiTest extends TestCase
 
     /**
      * @dataProvider yuanToFenProvider
+     * @requires extension bcmath
      * @param $yuan
      * @param $fen
      */

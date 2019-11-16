@@ -32,7 +32,8 @@
         "files": [
             "src/bootstrap.php",
             "src/debug_helper.php",
-            "src/reflection_helper.php"
+            "src/reflection_helper.php",
+            "src/Crypto/crypto_func.php"
         ]
     },
     "autoload-dev": {
