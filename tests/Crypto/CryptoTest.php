@@ -38,8 +38,34 @@ class CryptoTest extends TestCase
 
     public function encryptDataProvider()
     {
+        $ignore_methods = [
+            'aes-128-ocb',
+            'aes-192-ocb',
+            'aes-256-ocb',
+            'id-aes128-wrap',
+            'id-aes192-wrap',
+            'id-aes256-wrap',
+            'id-aes128-wrap-8',
+            'id-aes192-wrap-8',
+            'id-aes256-wrap-8',
+            'id-aes128-wrap-pad',
+            'id-aes192-wrap-pad',
+            'id-aes256-wrap-pad',
+            'id-aes128-wrap-pad-4',
+            'id-aes192-wrap-pad-4',
+            'id-aes256-wrap-pad-4',
+            'id-smime-alg-cms3deswrap',
+        ];
+        $real_ignore = array_flip($ignore_methods);
         foreach (openssl_get_cipher_methods() as $method) {
-            yield ['aaaaaaaaaa', '123456789', $method];
+            if (isset($real_ignore[strtolower($method)])) {
+                echo 'not support openssl method: ' . $method . PHP_EOL;
+                continue;
+            }
+            yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(8), $method];
+            yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(32), $method];
+            yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(64), $method];
+            yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(128), $method];
         }
     }
 
@@ -51,14 +77,9 @@ class CryptoTest extends TestCase
      */
     public function testEncryptData(string $data, string $password, string $method)
     {
-        try {
-            $enc = encrypt_data($data, $password, $method);
-            $verify = decrypt_data($enc, $password, $method);
-        } catch (\Throwable $exception) {
-            var_dump($method);
-            throw $exception;
-        }
-
+        $add = strpos($method, '-ccm') >= 0 ? $password : null;
+        $enc = encrypt_data($data, $password, $method, $add);
+        $verify = decrypt_data($enc, $password, $method, $add);
 
         $this->assertEquals($data, $verify);
     }

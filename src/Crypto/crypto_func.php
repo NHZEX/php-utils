@@ -5,12 +5,6 @@ namespace HZEX\Crypto;
 
 use RuntimeException;
 
-const BLOCK_LEN = [
-    'aes128' => 16,
-    'aes192' => 24,
-    'aes256' => 32,
-];
-
 /**
  * @param array|string $data     待签数据
  * @param string       $password 签名秘钥
@@ -44,80 +38,60 @@ function sign_verify(string $sign, $data, string $password, string $algo = 'sha1
 }
 
 /**
- * @param string $data     待加密数据
- * @param string $password 加密秘钥
- * @param string $method   加密算法名称
+ * @param string      $data     待加密数据
+ * @param string      $password 加密秘钥
+ * @param string      $method   加密算法名称
+ * @param string|null $add
  * @return string         已加密数据
  */
-function encrypt_data(string $data, string $password, string $method = 'AES-128-CFB'): string
+function encrypt_data(string $data, string $password, string $method = 'aes-128-cfb', ?string $add = null): string
 {
     $method = strtolower($method);
     $mode = strrchr($method, '-');
 
-    $add = '';
+    $iv = '';
+    $tag = '';
     $parame = [];
-    if ('-ecb' === $mode) {
-        $iv = '';
-    } else {
-        $iv_len = openssl_cipher_iv_length($method);
-        if (false !== $iv_len) {
-            $iv = openssl_random_pseudo_bytes($iv_len);
-            if ('-ccm' === $mode || '-gcm' === $mode) {
-                $tag = null;
-                $parame = [$iv, &$tag, $add, 16];
-            } elseif (false !== $iv) {
-                $parame = [$iv];
-            }
-        }
+    $ivSize = openssl_cipher_iv_length($method);
+    if (!empty($ivSize)) {
+        $iv = openssl_random_pseudo_bytes($ivSize);
     }
-    $output = openssl_encrypt($data, $method, $password, OPENSSL_RAW_DATA, ...$parame);
+    if ('-ccm' === $mode || '-gcm' === $mode) {
+        $parame = [&$tag, $add, 16];
+    }
+    $output = openssl_encrypt($data, $method, $password, OPENSSL_RAW_DATA, $iv, ...$parame);
     if (false === $output) {
-        throw new RuntimeException('openssl operating failure: ' . openssl_error_string());
+        throw new RuntimeException("openssl encrypt [$method] failure: " . openssl_error_string());
     }
-    if (isset($iv)) {
-        if (isset($tag)) {
-            return $output . $iv . $tag;
-        }
-        return $output . $iv;
-    }
-    return $output;
+    return $iv . $tag . $output;
 }
 
 /**
- * @param string $data     待加密数据
- * @param string $password 加密秘钥
- * @param string $method   加密算法名称
+ * @param string      $data     待加密数据
+ * @param string      $password 加密秘钥
+ * @param string      $method   加密算法名称
+ * @param string|null $add
  * @return string         已加密数据
  */
-function decrypt_data(string $data, string $password, string $method = 'AES-128-CFB')
+function decrypt_data(string $data, string $password, string $method = 'aes-128-cfb', ?string $add = null)
 {
     $method = strtolower($method);
     $mode = strrchr($method, '-');
-    $tag = '';
-    $add = '';
-    if ('-ecb' === $mode) {
-        $iv = '';
-    } elseif ('-ccm' === $mode || '-gcm' === $mode) {
-        $iv_len = openssl_cipher_iv_length($method);
-        $iv_len *= -1;
-        [$data, $iv, $tag] = [
-            substr($data, 0, $iv_len - 16),
-            substr($data, $iv_len - 16, $iv_len * -1),
-            substr($data, -16)
+    $ivSize = openssl_cipher_iv_length($method) ?: 0;
+    if ('-ccm' === $mode || '-gcm' === $mode) {
+        [$iv, $tag, $data] = [
+            substr($data, 0, $ivSize),
+            substr($data, $ivSize, 16),
+            substr($data, $ivSize + 16)
         ];
+        $parame = [$iv, $tag, $add];
     } else {
-        $iv_len = openssl_cipher_iv_length($method);
-        if (false === $iv_len) {
-            $iv = '';
-        } else {
-            $iv_len *= -1;
-            [$data, $iv] = [substr($data, 0, $iv_len), substr($data, $iv_len)];
-        }
-
+        [$iv, $data] = [substr($data, 0, $ivSize), substr($data, $ivSize)];
+        $parame = [$iv];
     }
-    $output = openssl_decrypt($data, $method, $password, OPENSSL_RAW_DATA, $iv, $tag);
+    $output = openssl_decrypt($data, $method, $password, OPENSSL_RAW_DATA, ...$parame);
     if (false === $output) {
-        throw new RuntimeException('openssl operating failure: ' . openssl_error_string());
+        throw new RuntimeException("openssl decrypt [$method] failure: " . openssl_error_string());
     }
     return $output;
 }
