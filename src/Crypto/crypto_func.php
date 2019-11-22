@@ -4,6 +4,18 @@ declare(strict_types=1);
 namespace HZEX\Crypto;
 
 use RuntimeException;
+use function hash_equals;
+use function hash_hmac;
+use function http_build_query;
+use function is_array;
+use function ksort;
+use function openssl_cipher_iv_length;
+use function openssl_decrypt;
+use function openssl_encrypt;
+use function openssl_random_pseudo_bytes;
+use function strrchr;
+use function strtolower;
+use function substr;
 
 /**
  * @param array|string $data     待签数据
