@@ -1,12 +1,12 @@
 <?php
 
-namespace HZEX\DataStruct;
+namespace Zxin\DataStruct;
 
-use HZEX\DataStruct\Exception\StructTypeException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 use RuntimeException;
+use Zxin\DataStruct\Exception\StructTypeException;
 
 trait DataStructSupport
 {
@@ -36,7 +36,6 @@ trait DataStructSupport
             return;
         }
         $file = self::$BUILD_PATH . self::$DUMP_FILE_NAME;
-        /** @noinspection PhpUnhandledExceptionInspection */
         $content = '<?php'
             . PHP_EOL
             . 'return \unserialize('

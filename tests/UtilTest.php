@@ -1,9 +1,9 @@
 <?php
 
-namespace HZEX\Tests;
+namespace Zxin\Tests;
 
-use HZEX\Util;
 use PHPUnit\Framework\TestCase;
+use Zxin\Util;
 
 class UtilTest extends TestCase
 {

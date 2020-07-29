@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace HZEX\Tests\Crypto;
+namespace Zxin\Tests\Crypto;
 
 use PHPUnit\Framework\TestCase;
-use function HZEX\Crypto\decrypt_data;
-use function HZEX\Crypto\encrypt_data;
-use function HZEX\Crypto\sign_data;
-use function HZEX\Crypto\sign_verify;
+use function Zxin\Crypto\decrypt_data;
+use function Zxin\Crypto\encrypt_data;
+use function Zxin\Crypto\sign_data;
+use function Zxin\Crypto\sign_verify;
 
 class CryptoTest extends TestCase
 {

@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace HZEX;
+namespace Zxin;
 
 class Util
 {

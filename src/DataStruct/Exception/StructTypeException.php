@@ -1,6 +1,6 @@
 <?php
 
-namespace HZEX\DataStruct\Exception;
+namespace Zxin\DataStruct\Exception;
 
 class StructTypeException extends StructException
 {

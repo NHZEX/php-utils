@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace HZEX\Crypto;
+namespace Zxin\Crypto;
 
 use RuntimeException;
 use function hash_equals;

@@ -1,11 +1,11 @@
 <?php
 
-namespace HZEX\Stub;
+namespace Zxin\Stub;
 
 use Closure;
 use DateTime;
-use HZEX\DataStruct\DataStruct;
 use stdClass;
+use Zxin\DataStruct\DataStruct;
 
 class DataStructStub extends DataStruct
 {

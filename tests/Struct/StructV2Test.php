@@ -1,17 +1,17 @@
 <?php
 
-namespace HZEX\Tests\Struct;
+namespace Zxin\Tests\Struct;
 
 use Closure;
 use DateTime;
-use HZEX\DataStruct\Exception\StructReadOnlyException;
-use HZEX\DataStruct\Exception\StructTypeException;
-use HZEX\DataStruct\Exception\StructUndefinedException;
-use HZEX\Stub\DataStructStub;
-use HZEX\Stub\EmptyClassA;
-use HZEX\Stub\EmptyClassAb;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use Zxin\DataStruct\Exception\StructReadOnlyException;
+use Zxin\DataStruct\Exception\StructTypeException;
+use Zxin\DataStruct\Exception\StructUndefinedException;
+use Zxin\Stub\DataStructStub;
+use Zxin\Stub\EmptyClassA;
+use Zxin\Stub\EmptyClassAb;
 
 class StructV2Test extends TestCase
 {

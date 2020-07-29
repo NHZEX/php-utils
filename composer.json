@@ -1,6 +1,6 @@
 {
-    "name": "nhzex/n-helper",
-    "description": "助手",
+    "name": "zxin/utils",
+    "description": "util tools",
     "type": "library",
     "license": "Apache-2.0",
     "authors": [
@@ -26,8 +26,7 @@
     },
     "autoload": {
         "psr-4": {
-            "HZEX\\": "src/",
-            "HuangZx\\": "src/"
+            "Zxin\\": "src/"
         },
         "files": [
             "src/bootstrap.php",
@@ -38,14 +37,14 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "HZEX\\Tests\\": "tests/",
-            "HZEX\\Stub\\": "stub/",
+            "Zxin\\Tests\\": "tests/",
+            "Zxin\\Stub\\": "stub/",
             "Example\\": "example/"
         }
     },
     "config": {
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": false
     },
     "minimum-stability": "stable"
 }

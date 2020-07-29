@@ -1,6 +1,6 @@
 <?php
 
-namespace HZEX\Stub;
+namespace Zxin\Stub;
 
 interface EmptyInterface
 {

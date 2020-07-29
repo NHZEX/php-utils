@@ -1,12 +1,12 @@
 <?php
 
-namespace HZEX\Tests\DataStruct;
+namespace Zxin\Tests\DataStruct;
 
-use HZEX\DataStruct\ReflectionClassExpansion;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionException;
 use StdClass;
+use Zxin\DataStruct\ReflectionClassExpansion;
 
 class ReflectionClassExpansionTest extends TestCase
 {

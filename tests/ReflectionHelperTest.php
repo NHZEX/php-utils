@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace HZEX\Tests;
+namespace Zxin\Tests;
 
-use HZEX\Stub\ClassC;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
-use function HuangZx\ref_get_prop;
+use Zxin\Stub\ClassC;
+use function Zxin\ref_get_prop;
 
 class ReflectionHelperTest extends TestCase
 {

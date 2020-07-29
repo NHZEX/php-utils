@@ -1,12 +1,12 @@
 <?php
 
-namespace HZEX\DataStruct;
+namespace Zxin\DataStruct;
 
 use ArrayAccess;
-use HZEX\DataStruct\Exception\StructReadOnlyException;
-use HZEX\DataStruct\Exception\StructUndefinedException;
 use JsonSerializable;
 use ReflectionException;
+use Zxin\DataStruct\Exception\StructReadOnlyException;
+use Zxin\DataStruct\Exception\StructUndefinedException;
 
 /**
  * Class DataStruct

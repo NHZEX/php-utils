@@ -1,6 +1,6 @@
 <?php
 
-namespace HZEX\DataStruct;
+namespace Zxin\DataStruct;
 
 use ReflectionClass;
 use RuntimeException;

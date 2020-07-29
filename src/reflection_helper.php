@@ -1,9 +1,9 @@
 <?php
-namespace HuangZx;
+namespace Zxin;
 
-use HZEX\Reflection\Property;
 use ReflectionException;
 use ReflectionObject;
+use Zxin\Reflection\Property;
 
 /**
  * 反射获取类属性操作对象

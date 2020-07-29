@@ -1,5 +1,5 @@
 <?php
-namespace HuangZx;
+namespace Zxin;
 
 use Closure;
 use ReflectionException;
