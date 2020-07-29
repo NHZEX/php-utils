@@ -3,19 +3,26 @@ declare(strict_types=1);
 
 namespace Zxin\Crypto;
 
+use LengthException;
 use RuntimeException;
 use function hash_equals;
 use function hash_hmac;
 use function http_build_query;
+use function in_array;
 use function is_array;
 use function ksort;
 use function openssl_cipher_iv_length;
 use function openssl_decrypt;
 use function openssl_encrypt;
+use function openssl_error_string;
 use function openssl_random_pseudo_bytes;
+use function sprintf;
+use function strlen;
 use function strrchr;
 use function strtolower;
 use function substr;
+
+const AES_KEY_SIZES = [16, 24, 32];
 
 /**
  * @param array|string $data     待签数据
@@ -106,4 +113,40 @@ function decrypt_data(string $data, string $password, string $method = 'aes-128-
         throw new RuntimeException("openssl decrypt [$method] failure: " . openssl_error_string());
     }
     return $output;
+}
+
+function aes_gcm_encrypt(string $content, string $key)
+{
+    if (!in_array($keyLen = strlen($key), AES_KEY_SIZES)) {
+        throw new LengthException(sprintf('invalid key length: %d', $keyLen));
+    }
+    $aesBitSize = $keyLen * 8;
+    $iv = openssl_random_pseudo_bytes(12);
+    $tagLen = 16;
+    $add = '';
+
+    $ciphertext = openssl_encrypt($content, "aes-{$aesBitSize}-gcm", $key, OPENSSL_RAW_DATA, $iv, $tag, $add, $tagLen);
+    if (false === $ciphertext) {
+        throw new RuntimeException("aes encrypt fail: " . openssl_error_string());
+    }
+    return $iv . $ciphertext . $tag;
+}
+
+function aes_gcm_decrypt(string $content, string $key)
+{
+    if (!in_array($keyLen = strlen($key), AES_KEY_SIZES)) {
+        throw new LengthException(sprintf('invalid key length: %d', $keyLen));
+    }
+
+    $aesBitSize = $keyLen * 8;
+    $iv = substr($content, 0, 12);
+    $tag = substr($content, -16);
+    $add = '';
+    $ciphertext = substr($content, 12, -16);
+
+    $plaintext = openssl_decrypt($ciphertext, "aes-{$aesBitSize}-gcm", $key, OPENSSL_RAW_DATA, $iv, $tag, $add);
+    if ($plaintext === false) {
+        throw new RuntimeException("aes encrypt fail: " . openssl_error_string());
+    }
+    return $plaintext;
 }

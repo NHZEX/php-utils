@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Zxin\Tests\Crypto;
 
 use PHPUnit\Framework\TestCase;
+use function Zxin\Crypto\aes_gcm_decrypt;
+use function Zxin\Crypto\aes_gcm_encrypt;
 use function Zxin\Crypto\decrypt_data;
 use function Zxin\Crypto\encrypt_data;
 use function Zxin\Crypto\sign_data;
@@ -82,5 +84,24 @@ class CryptoTest extends TestCase
         $verify = decrypt_data($enc, $password, $method, $add);
 
         $this->assertEquals($data, $verify);
+    }
+
+    public function aesGcmProvider()
+    {
+        yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(16)];
+        yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(24)];
+        yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(32)];
+    }
+
+    /**
+     * @dataProvider aesGcmProvider
+     * @param string $data
+     * @param string $password
+     */
+    public function testAesGcm(string $data, string $password)
+    {
+        $ciphertext = aes_gcm_encrypt($data, $password);
+        $plaintext = aes_gcm_decrypt($ciphertext, $password);
+        $this->assertEquals($data, $plaintext);
     }
 }
