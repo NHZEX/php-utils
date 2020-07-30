@@ -16,6 +16,8 @@ class UtilTest extends TestCase
     public function testToUpperCamelCase(string $str, string $expected)
     {
         $this->assertEquals($expected, Util::toLowerCamelCase($str));
+        // 缓存生效
+        $this->assertEquals($expected, Util::toLowerCamelCase($str));
     }
 
     public function toUpperCamelCaseProvider()

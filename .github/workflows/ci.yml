@@ -9,7 +9,6 @@ jobs:
       fail-fast: false
       matrix:
         php:
-          - 7.1
           - 7.2
           - 7.3
           - 7.4
@@ -25,7 +24,6 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: openssl, posix #optional, setup extensions
           coverage: none #optional, setup coverage driver
-          pecl: false #optional, setup PECL
 
       - name: Check Version
         run: |
