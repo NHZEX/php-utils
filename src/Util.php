@@ -63,7 +63,7 @@ class Util
             return self::$lowerCamelCache[$input];
         }
         $lower = lcfirst(self::toUpperCamelCase($input));
-        return $lowerCamelCache[$input] = $lower;
+        return self::$lowerCamelCache[$input] = $lower;
     }
 
     /**
