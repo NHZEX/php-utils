@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Zxin\Tests\Crypto;
 
+use LengthException;
 use PHPUnit\Framework\TestCase;
+use function openssl_random_pseudo_bytes;
+use function str_repeat;
 use function Zxin\Crypto\aes_gcm_decrypt;
 use function Zxin\Crypto\aes_gcm_encrypt;
 use function Zxin\Crypto\decrypt_data;
@@ -103,5 +106,21 @@ class CryptoTest extends TestCase
         $ciphertext = aes_gcm_encrypt($data, $password);
         $plaintext = aes_gcm_decrypt($ciphertext, $password);
         $this->assertEquals($data, $plaintext);
+    }
+
+    public function aesGcmExceptionProvider()
+    {
+        yield [str_repeat('0', 8)];
+        yield [str_repeat('0', 38)];
+    }
+
+    /**
+     * @dataProvider aesGcmExceptionProvider
+     * @param string $password
+     */
+    public function testAesGcmException(string $password)
+    {
+        $this->expectException(LengthException::class);
+        aes_gcm_encrypt('0', $password);
     }
 }

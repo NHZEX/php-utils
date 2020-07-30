@@ -146,7 +146,7 @@ function aes_gcm_decrypt(string $content, string $key)
 
     $plaintext = openssl_decrypt($ciphertext, "aes-{$aesBitSize}-gcm", $key, OPENSSL_RAW_DATA, $iv, $tag, $add);
     if ($plaintext === false) {
-        throw new RuntimeException("aes encrypt fail: " . openssl_error_string());
+        throw new RuntimeException("aes decrypt fail: " . openssl_error_string());
     }
     return $plaintext;
 }
