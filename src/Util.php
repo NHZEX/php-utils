@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Zxin;
 
+use function extension_loaded;
+
 class Util
 {
     protected static $snakeChahe = [];
@@ -72,6 +74,9 @@ class Util
      */
     public static function whoami(): string
     {
+        if (!extension_loaded('posix')) {
+            return 'null';
+        }
         return posix_getpwuid(posix_geteuid())['name'];
     }
 }
