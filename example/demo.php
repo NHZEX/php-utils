@@ -1,10 +1,9 @@
 <?php
 
-use HZEX\DataStruct\DataStruct;
-use HZEX\Stub\DataStructStub;
+use Zxin\DataStruct\DataStruct;
+use Zxin\Stub\DataStructStub;
 
 require __DIR__ . '/../vendor/autoload.php';
-//require __DIR__ . '/../vendor/topthink/framework/base.php';
 
 DataStruct::setProjectRootPath(__DIR__ . '/../');
 DataStruct::setCachePath('./../runtime/');
