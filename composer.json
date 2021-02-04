@@ -19,11 +19,13 @@
     "require-dev": {
         "ext-bcmath": "*",
         "ext-posix": "*",
+        "ext-mbstring": "*",
         "phpunit/phpunit": "^7|^8|^9"
     },
     "suggest": {
         "ext-bcmath": "unit convertor support",
-        "ext-posix": "posix"
+        "ext-posix": "posix",
+        "ext-mbstring": "mbstring"
     },
     "autoload": {
         "psr-4": {
@@ -34,7 +36,8 @@
             "src/debug_helper.php",
             "src/reflection_helper.php",
             "src/Crypto/crypto_func.php",
-            "src/Array/array_func.php"
+            "src/Array/array_func.php",
+            "src/String/string_func.php"
         ]
     },
     "autoload-dev": {
