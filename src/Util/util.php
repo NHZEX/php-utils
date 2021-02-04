@@ -1,10 +1,23 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Util;
 
 use Exception;
 use RuntimeException;
+use function base64_decode;
+use function base64_encode;
+use function bin2hex;
+use function chr;
+use function ord;
+use function random_bytes;
+use function rtrim;
+use function str_repeat;
+use function str_split;
+use function strlen;
+use function strtr;
+use function vsprintf;
 
 /**
  * Base64 Url安全编码

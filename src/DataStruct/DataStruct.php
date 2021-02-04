@@ -7,6 +7,10 @@ use JsonSerializable;
 use ReflectionException;
 use Zxin\DataStruct\Exception\StructReadOnlyException;
 use Zxin\DataStruct\Exception\StructUndefinedException;
+use function array_diff_key;
+use function count;
+use function is_dir;
+use function realpath;
 
 /**
  * Class DataStruct

@@ -1,4 +1,5 @@
 <?php
+
 namespace Zxin;
 
 use ReflectionException;

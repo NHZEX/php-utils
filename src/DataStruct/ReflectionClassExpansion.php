@@ -4,6 +4,14 @@ namespace Zxin\DataStruct;
 
 use ReflectionClass;
 use RuntimeException;
+use function fclose;
+use function feof;
+use function fgets;
+use function fopen;
+use function is_array;
+use function strrpos;
+use function substr;
+use function token_get_all;
 
 class ReflectionClassExpansion
 {

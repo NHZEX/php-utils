@@ -7,6 +7,32 @@ use ReflectionException;
 use ReflectionProperty;
 use RuntimeException;
 use Zxin\DataStruct\Exception\StructTypeException;
+use function array_flip;
+use function array_map;
+use function class_exists;
+use function count;
+use function explode;
+use function file_put_contents;
+use function gettype;
+use function interface_exists;
+use function is_array;
+use function is_bool;
+use function is_callable;
+use function is_file;
+use function is_float;
+use function is_int;
+use function is_iterable;
+use function is_null;
+use function is_object;
+use function is_resource;
+use function is_string;
+use function preg_match_all;
+use function serialize;
+use function sha1_file;
+use function sprintf;
+use function strlen;
+use function substr;
+use function var_export;
 
 trait DataStructSupport
 {

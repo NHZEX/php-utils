@@ -1,10 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\DataStruct;
 
 use ArrayAccess;
 use JsonSerializable;
+use function array_diff_key;
+use function array_flip;
+use function count;
+use function get_object_vars;
+use function property_exists;
 
 abstract class BaseProperty implements ArrayAccess, JsonSerializable
 {
@@ -68,7 +74,7 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
     private function getPublicVars(): array
     {
         /** @var $e */
-        $e = new class {
+        $e = new class() {
             /**
              * @param $that
              * @return array

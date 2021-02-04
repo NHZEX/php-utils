@@ -2,6 +2,10 @@
 
 namespace Zxin\Arr;
 
+use function array_column;
+use function call_user_func_array;
+use function is_string;
+
 /**
  * 多维数组指定多字段排序
  * order：SORT_ASC升序 , SORT_DESC降序

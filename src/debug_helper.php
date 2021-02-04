@@ -1,4 +1,5 @@
 <?php
+
 namespace Zxin;
 
 use Closure;
@@ -7,7 +8,14 @@ use ReflectionFunction;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function get_class;
+use function is_array;
+use function is_object;
+use function max;
+use function min;
+use function rtrim;
 use function spl_object_id;
+use function strlen;
+use function substr;
 use function var_export;
 
 function set_path_cut_len(?int $clen = null): int

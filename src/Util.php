@@ -10,6 +10,13 @@ declare(strict_types=1);
 namespace Zxin;
 
 use function extension_loaded;
+use function lcfirst;
+use function posix_geteuid;
+use function posix_getpwuid;
+use function preg_replace;
+use function str_replace;
+use function strtolower;
+use function ucwords;
 
 class Util
 {
