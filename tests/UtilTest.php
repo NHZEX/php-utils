@@ -5,10 +5,10 @@ namespace Zxin\Tests;
 use PHPUnit\Framework\TestCase;
 use Zxin\Util;
 use function hex2bin;
+use function strlen;
 
 class UtilTest extends TestCase
 {
-
     /**
      * @dataProvider toUpperCamelCaseProvider
      * @param string $str
@@ -99,5 +99,14 @@ class UtilTest extends TestCase
         $this->assertEquals($ciphertext, $result);
         $output = Util\base64_urlsafe_decode($result);
         $this->assertEquals($plaintext, $output);
+    }
+
+    /**
+     * @requires extension openssl
+     */
+    public function testUuidV4()
+    {
+        $uuid = Util\uuidv4();
+        $this->assertEquals(36, strlen($uuid));
     }
 }
