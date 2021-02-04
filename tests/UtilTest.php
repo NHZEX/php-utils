@@ -4,6 +4,7 @@ namespace Zxin\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Zxin\Util;
+use function hex2bin;
 
 class UtilTest extends TestCase
 {
@@ -20,7 +21,7 @@ class UtilTest extends TestCase
         $this->assertEquals($expected, Util::toLowerCamelCase($str));
     }
 
-    public function toUpperCamelCaseProvider()
+    public function toUpperCamelCaseProvider(): array
     {
         return [
             ['qwe_asd_zxc', 'qweAsdZxc'],
@@ -39,7 +40,7 @@ class UtilTest extends TestCase
         $this->assertEquals($expected, Util::toUpperCamelCase($str));
     }
 
-    public function toSnakeCaseProvider()
+    public function toSnakeCaseProvider(): array
     {
         return [
             ['qwe_asd_zxc', 'QweAsdZxc'],
@@ -76,5 +77,27 @@ class UtilTest extends TestCase
     public function testWhoami()
     {
         $this->assertEquals(trim(shell_exec('whoami')), Util::whoami());
+    }
+
+    public function base64UrlProvider(): array
+    {
+        return [
+            [hex2bin('d19085537f7aebf0ca16beebea'), '0ZCFU3966_DKFr7r6g'],
+            [hex2bin('24c7679be53f81a190a5032219'), 'JMdnm-U_gaGQpQMiGQ'],
+        ];
+    }
+
+    /**
+     * @dataProvider base64UrlProvider
+     * @param string $plaintext
+     * @param string $ciphertext
+     */
+    public function testBase64Url(string $plaintext, string $ciphertext)
+    {
+        $result = Util\base64_urlsafe_encode($plaintext);
+        $this->assertDoesNotMatchRegularExpression('~(=|\+|\/)~', $result);
+        $this->assertEquals($ciphertext, $result);
+        $output = Util\base64_urlsafe_decode($result);
+        $this->assertEquals($plaintext, $output);
     }
 }
