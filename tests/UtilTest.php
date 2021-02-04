@@ -3,9 +3,11 @@
 namespace Zxin\Tests;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\Version;
 use Zxin\Util;
 use function hex2bin;
 use function strlen;
+use function version_compare;
 
 class UtilTest extends TestCase
 {
@@ -95,7 +97,11 @@ class UtilTest extends TestCase
     public function testBase64Url(string $plaintext, string $ciphertext)
     {
         $result = Util\base64_urlsafe_encode($plaintext);
-        $this->assertDoesNotMatchRegularExpression('~(=|\+|\/)~', $result);
+        if (version_compare(Version::id(), '9.1', '>=')) {
+            $this->assertDoesNotMatchRegularExpression('~(=|\+|\/)~', $result);
+        } else {
+            $this->assertNotRegExp('~(=|\+|\/)~', $result);
+        }
         $this->assertEquals($ciphertext, $result);
         $output = Util\base64_urlsafe_decode($result);
         $this->assertEquals($plaintext, $output);
