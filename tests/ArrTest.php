@@ -3,7 +3,7 @@
 namespace Zxin\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Zxin\Arr;
+use function Zxin\Arr\array_multi_field_sort;
 
 class ArrTest extends TestCase
 {
@@ -82,6 +82,6 @@ class ArrTest extends TestCase
      */
     public function testMultiFieldSort(array $expected, array $array1, array $array2)
     {
-        $this->assertEquals($expected, Arr::multiFieldSort($array1, ...$array2));
+        $this->assertEquals($expected, array_multi_field_sort($array1, ...$array2));
     }
 }
