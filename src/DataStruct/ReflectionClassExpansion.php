@@ -73,6 +73,16 @@ class ReflectionClassExpansion
                         case T_AS:
                             $existAlias = true;
                             break;
+                        default:
+                            if (PHP_VERSION_ID >= 80000) {
+                                if (T_NAME_FULLY_QUALIFIED === $token[0]
+                                    || T_NAME_RELATIVE === $token[0]
+                                    || T_NAME_QUALIFIED === $token[0]
+                                ) {
+                                    $currUseClass['class'] .= $token[1];
+                                    break;
+                                }
+                            }
                     }
                 }
                 continue;

@@ -19,7 +19,7 @@
     "require-dev": {
         "ext-bcmath": "*",
         "ext-posix": "*",
-        "phpunit/phpunit": "^7|^8"
+        "phpunit/phpunit": "^7|^8|^9"
     },
     "suggest": {
         "ext-bcmath": "unit convertor support",
