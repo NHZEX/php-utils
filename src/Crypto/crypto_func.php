@@ -18,8 +18,8 @@ use function openssl_encrypt;
 use function openssl_error_string;
 use function openssl_random_pseudo_bytes;
 use function sprintf;
+use function str_ends_with;
 use function strlen;
-use function strrchr;
 use function strtolower;
 use function substr;
 
@@ -39,9 +39,7 @@ function sign_data($data, string $password, $algo = 'sha1', $raw_output = false)
         $data = http_build_query($data);
     }
 
-    $sign = hash_hmac($algo, $data, $password, $raw_output);
-
-    return $sign;
+    return hash_hmac($algo, $data, $password, $raw_output);
 }
 
 /**
@@ -52,7 +50,7 @@ function sign_data($data, string $password, $algo = 'sha1', $raw_output = false)
  * @param bool         $raw_output
  * @return bool
  */
-function sign_verify(string $sign, $data, string $password, string $algo = 'sha1', bool $raw_output = false)
+function sign_verify(string $sign, $data, string $password, string $algo = 'sha1', bool $raw_output = false): bool
 {
     return hash_equals(sign_data($data, $password, $algo, $raw_output), $sign);
 }
@@ -64,10 +62,9 @@ function sign_verify(string $sign, $data, string $password, string $algo = 'sha1
  * @param string|null $add
  * @return string         已加密数据
  */
-function encrypt_data(string $data, string $password, string $method = 'aes-128-cfb', ?string $add = null): string
+function encrypt_data(string $data, string $password, string $method = 'aes-128-cbc', ?string $add = null): string
 {
     $method = strtolower($method);
-    $mode = strrchr($method, '-');
 
     $iv = '';
     $tag = '';
@@ -76,7 +73,7 @@ function encrypt_data(string $data, string $password, string $method = 'aes-128-
     if (!empty($ivSize)) {
         $iv = openssl_random_pseudo_bytes($ivSize);
     }
-    if ('-ccm' === $mode || '-gcm' === $mode) {
+    if (str_ends_with($method, 'gcm') || str_ends_with($method, 'ccm') || str_ends_with($method, 'ocb')) {
         $parame = [&$tag, $add, 16];
     }
     $output = openssl_encrypt($data, $method, $password, OPENSSL_RAW_DATA, $iv, ...$parame);
@@ -91,14 +88,13 @@ function encrypt_data(string $data, string $password, string $method = 'aes-128-
  * @param string      $password 加密秘钥
  * @param string      $method   加密算法名称
  * @param string|null $add
- * @return string         已加密数据
+ * @return string
  */
-function decrypt_data(string $data, string $password, string $method = 'aes-128-cfb', ?string $add = null)
+function decrypt_data(string $data, string $password, string $method = 'aes-128-cbc', ?string $add = null): string
 {
     $method = strtolower($method);
-    $mode = strrchr($method, '-');
     $ivSize = openssl_cipher_iv_length($method) ?: 0;
-    if ('-ccm' === $mode || '-gcm' === $mode) {
+    if (str_ends_with($method, 'gcm') || str_ends_with($method, 'ccm') || str_ends_with($method, 'ocb')) {
         [$iv, $tag, $data] = [
             substr($data, 0, $ivSize),
             substr($data, $ivSize, 16),
@@ -116,7 +112,7 @@ function decrypt_data(string $data, string $password, string $method = 'aes-128-
     return $output;
 }
 
-function aes_gcm_encrypt(string $content, string $key)
+function aes_gcm_encrypt(string $content, string $key): string
 {
     if (!in_array($keyLen = strlen($key), AES_KEY_SIZES)) {
         throw new LengthException(sprintf('invalid key length: %d', $keyLen));
@@ -133,7 +129,7 @@ function aes_gcm_encrypt(string $content, string $key)
     return $iv . $ciphertext . $tag;
 }
 
-function aes_gcm_decrypt(string $content, string $key)
+function aes_gcm_decrypt(string $content, string $key): string
 {
     if (!in_array($keyLen = strlen($key), AES_KEY_SIZES)) {
         throw new LengthException(sprintf('invalid key length: %d', $keyLen));

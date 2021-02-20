@@ -6,7 +6,9 @@ namespace Zxin\Tests\Crypto;
 use LengthException;
 use PHPUnit\Framework\TestCase;
 use function openssl_random_pseudo_bytes;
+use function str_ends_with;
 use function str_repeat;
+use function strtolower;
 use function Zxin\Crypto\aes_gcm_decrypt;
 use function Zxin\Crypto\aes_gcm_encrypt;
 use function Zxin\Crypto\decrypt_data;
@@ -43,29 +45,16 @@ class CryptoTest extends TestCase
 
     public function encryptDataProvider()
     {
-        $ignore_methods = [
-            'aes-128-ocb',
-            'aes-192-ocb',
-            'aes-256-ocb',
-            'id-aes128-wrap',
-            'id-aes192-wrap',
-            'id-aes256-wrap',
-            'id-aes128-wrap-8',
-            'id-aes192-wrap-8',
-            'id-aes256-wrap-8',
-            'id-aes128-wrap-pad',
-            'id-aes192-wrap-pad',
-            'id-aes256-wrap-pad',
-            'id-aes128-wrap-pad-4',
-            'id-aes192-wrap-pad-4',
-            'id-aes256-wrap-pad-4',
-            'id-smime-alg-cms3deswrap',
+        $ignoreMethodSuffix = [
+            'wrap',
+            'wrap-pad',
         ];
-        $real_ignore = array_flip($ignore_methods);
         foreach (openssl_get_cipher_methods() as $method) {
-            if (isset($real_ignore[strtolower($method)])) {
-                echo 'not support openssl method: ' . $method . PHP_EOL;
-                continue;
+            foreach ($ignoreMethodSuffix as $suffix) {
+                if (str_ends_with(strtolower($method), $suffix)) {
+                    echo '> not support openssl method: ' . $method . PHP_EOL;
+                    continue 2;
+                }
             }
             yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(8), $method];
             yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(32), $method];
@@ -82,7 +71,10 @@ class CryptoTest extends TestCase
      */
     public function testEncryptData(string $data, string $password, string $method)
     {
-        $add = strpos($method, '-ccm') >= 0 ? $password : null;
+        $method = strtolower($method);
+        $add = str_ends_with($method, 'ccm') || str_ends_with($method, 'gcm') || str_ends_with($method, 'ocb')
+            ? $password
+            : null;
         $enc = encrypt_data($data, $password, $method, $add);
         $verify = decrypt_data($enc, $password, $method, $add);
 
