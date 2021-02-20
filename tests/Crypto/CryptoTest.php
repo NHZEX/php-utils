@@ -49,6 +49,10 @@ class CryptoTest extends TestCase
             'wrap',
             'wrap-pad',
         ];
+        if (70413 > PHP_VERSION_ID) {
+            // aead mode bug https://bugs.php.net/bug.php?id=77156
+            $ignoreMethodSuffix[] = 'ocb';
+        }
         foreach (openssl_get_cipher_methods() as $method) {
             foreach ($ignoreMethodSuffix as $suffix) {
                 if (str_ends_with(strtolower($method), $suffix)) {
