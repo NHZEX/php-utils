@@ -8,25 +8,37 @@ use ArrayAccess;
 use JsonSerializable;
 use function array_diff_key;
 use function array_flip;
-use function count;
 use function get_object_vars;
 use function property_exists;
 
 abstract class BaseProperty implements ArrayAccess, JsonSerializable
 {
-    private $hidden_key = [];
+    private $hiddenKey = [];
 
-    public function __construct(iterable $arr = [])
+    /** @var bool */
+    protected $propExistCheck = false;
+
+    public function __construct(?iterable $input = [])
     {
-        foreach ($arr as $key => $value) {
-            $this->$key = $value;
-        }
-
+        $this->load($input);
         $this->initialize();
     }
 
+    protected function load(?iterable $input)
+    {
+        if (!empty($input)) {
+            foreach ($input as $key => $value) {
+                if ($this->propExistCheck && !property_exists($this, $key)) {
+                    continue;
+                }
+                $this->$key = $value;
+            }
+        }
+    }
+
     /**
-     * 而外的初始化
+     * 结构初始化
+     * @return void
      */
     protected function initialize(): void
     {
@@ -34,13 +46,12 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
 
     /**
      * 设置需要隐藏的输出值
-     * @access public
      * @param  array $hidden 属性列表
      * @return $this
      */
-    public function hidden($hidden = []): self
+    public function hidden(array $hidden = []): BaseProperty
     {
-        $this->hidden_key = array_flip($hidden);
+        $this->hiddenKey = array_flip($hidden);
         return $this;
     }
 
@@ -60,9 +71,8 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
     public function toArray(): array
     {
         $data = $this->getPublicVars();
-        // 过滤隐藏值
-        if (count($this->hidden_key)) {
-            $data  = array_diff_key($data, $this->hidden_key);
+        if (!empty($this->hiddenKey)) {
+            $data  = array_diff_key($data, $this->hiddenKey);
         }
         return $data;
     }
@@ -73,31 +83,16 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
      */
     private function getPublicVars(): array
     {
-        /** @var $e */
-        $e = new class() {
-            /**
-             * @param $that
-             * @return array
-             */
-            public function read($that): array
-            {
-                return get_object_vars($that);
-            }
-        };
-        return $e->read($this) ?: [];
+        return (function ($that) {
+            return get_object_vars($that);
+        })->bindTo(null, null)($this);
     }
 
     /**
      * Whether a offset exists
      * @link  https://php.net/manual/en/arrayaccess.offsetexists.php
-     * @param mixed $offset <p>
-     *                      An offset to check for.
-     *                      </p>
+     * @param string $offset An offset to check for.
      * @return bool true on success or false on failure.
-     *                      </p>
-     *                      <p>
-     *                      The return value will be casted to boolean if non-boolean was returned.
-     * @since 5.0.0
      */
     public function offsetExists($offset)
     {
@@ -107,13 +102,10 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
     /**
      * Offset to retrieve
      * @link  https://php.net/manual/en/arrayaccess.offsetget.php
-     * @param mixed $offset <p>
-     *                      The offset to retrieve.
-     *                      </p>
+     * @param string $offset The offset to retrieve.
      * @return mixed Can return all value types.
-     * @since 5.0.0
      */
-    public function offsetGet($offset)
+    public function &offsetGet($offset)
     {
         return $this->$offset;
     }
@@ -121,40 +113,46 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
     /**
      * Offset to set
      * @link  https://php.net/manual/en/arrayaccess.offsetset.php
-     * @param mixed $offset <p>
-     *                      The offset to assign the value to.
-     *                      </p>
-     * @param mixed $value  <p>
-     *                      The value to set.
-     *                      </p>
+     * @param string $offset The offset to assign the value to.
+     * @param mixed $value  The value to set.
      * @return void
-     * @since 5.0.0
      */
     public function offsetSet($offset, $value)
     {
-        $this->$offset = $value;
+        $this->__set($offset, $value);
     }
 
     /**
      * Offset to unset
      * @link  https://php.net/manual/en/arrayaccess.offsetunset.php
-     * @param mixed $offset <p>
-     *                      The offset to unset.
-     *                      </p>
+     * @param string $offset The offset to unset.
      * @return void
-     * @since 5.0.0
      */
     public function offsetUnset($offset)
     {
-        $this->$offset = null;
+        $this->__unset($offset);
+    }
+
+    public function __set($name, $value)
+    {
+        if ($this->propExistCheck && !property_exists($this, $name)) {
+            return;
+        }
+        $this->$name = $value;
+    }
+
+    public function __unset($name)
+    {
+        if ($this->propExistCheck && !property_exists($this, $name)) {
+            return;
+        }
+        $this->$name = null;
     }
 
     /**
      * Specify data which should be serialized to JSON
      * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
-     * @since 5.4.0
+     * @return array data which can be serialized by json_encode, which is a value of any type other than a resource.
      */
     public function jsonSerialize()
     {
