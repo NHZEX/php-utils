@@ -15,6 +15,7 @@ use function realpath;
 /**
  * Class DataStruct
  * @package HZEX\DataStruct
+ * @deprecated use php 7.4 property types
  * @link https://wiki.php.net/rfc/typed_properties_v2
  */
 abstract class DataStruct implements ArrayAccess, JsonSerializable
