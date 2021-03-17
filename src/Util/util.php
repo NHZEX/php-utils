@@ -18,6 +18,10 @@ use function str_split;
 use function strlen;
 use function strtr;
 use function vsprintf;
+use function count;
+use function abs;
+use function sprintf;
+use function round;
 
 /**
  * Base64 Url安全编码
@@ -62,4 +66,28 @@ function uuidv4(): string
     $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
 
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
+/**
+ * @param int $byte
+ * @param int $dec
+ * @return string
+ */
+function format_byte(int $byte, int $dec = 2): string
+{
+    $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+    $count = count($units) - 1;
+    $pos  = 0;
+
+    $minus = $byte < 0;
+    $byte = abs($byte);
+
+    while ($byte >= 1024 && $pos < $count) {
+        $byte /= 1024;
+        $pos++;
+    }
+
+    $result = sprintf('%.2f', round($byte * ($minus ? -1 : 1), $dec));
+
+    return "{$result} {$units[$pos]}";
 }
