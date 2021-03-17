@@ -13,13 +13,16 @@
         "php": "^7.1|^8.0",
         "ext-json": "*",
         "ext-openssl": "*",
+        "symfony/polyfill-php72": "^1.22",
+        "symfony/polyfill-php73": "^1.22",
         "symfony/var-dumper": "^4.4|^5.0",
         "symfony/var-exporter": "^4.4|^5.0"
     },
     "require-dev": {
         "ext-bcmath": "*",
-        "ext-posix": "*",
         "ext-mbstring": "*",
+        "ext-posix": "*",
+        "friendsofphp/php-cs-fixer": "^2.18",
         "phpunit/phpunit": "^7|^8|^9"
     },
     "suggest": {
