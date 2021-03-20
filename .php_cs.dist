@@ -22,7 +22,7 @@ return $config
         // Imports or fully qualifies global classes/functions/constants.
         'global_namespace_import'    => ['import_classes' => true, 'import_constants' => true, 'import_functions' => true],
         // Add leading `\` before function invocation to speed up resolving.
-        'native_function_invocation' => true,
+        'native_function_invocation' => ['include' => ['@internal'], 'scope' => 'namespaced', 'strict' => true],
         // Array index should always be written by using square braces.
         'normalize_index_brace'      => true,
         // Operators - when multiline - must always be at the beginning or at the end of the line.
