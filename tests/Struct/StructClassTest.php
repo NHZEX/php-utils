@@ -7,7 +7,7 @@ use Zxin\Stub\DataImmutableStructStub;
 use Zxin\Stub\DataStructV1Stub;
 use Zxin\Tests\Base;
 
-class StructV1Test extends Base
+class StructClassTest extends Base
 {
     public function testAll()
     {
