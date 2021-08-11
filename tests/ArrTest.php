@@ -3,6 +3,7 @@
 namespace Zxin\Tests;
 
 use PHPUnit\Framework\TestCase;
+use function Zxin\Arr\array_flatten;
 use function Zxin\Arr\array_multi_field_sort;
 
 class ArrTest extends TestCase
@@ -83,5 +84,55 @@ class ArrTest extends TestCase
     public function testMultiFieldSort(array $expected, array $array1, array $array2)
     {
         $this->assertEquals($expected, array_multi_field_sort($array1, ...$array2));
+    }
+
+    /**
+     * @param array $expected
+     * @param array $array1
+     * @param array $array2
+     */
+    public function testArrayFlatten()
+    {
+        $this->assertEquals(
+            [
+                'asd'       => 123,
+                'qwe'       => true,
+                'uio_1'     => 1,
+                'uio_2'     => 2,
+                'uio_3'     => 3,
+                'uio_4'     => 4,
+                'uio_5_asd' => 1,
+                'uio_5_fgh' => 4,
+                'uio_5_rty' => 3,
+                'uio_5_zxc' => 2,
+                'zxc_1'     => 5,
+                'zxc_2'     => 6,
+                'zxc_3'     => 7,
+                'zxc_fgh'   => 3,
+                'zxc_rty'   => 2,
+                'zxc_vbn'   => 4,
+                'zxc_zxc'   => 1,
+            ],
+            array_flatten([
+                'zxc' => [
+                    2     => 6,
+                    'zxc' => 1,
+                    'rty' => 2,
+                    3     => 7,
+                    'fgh' => 3,
+                    'vbn' => 4,
+                    1     => 5,
+                ],
+                'qwe' => true,
+                'uio' => [
+                    3 => 3,
+                    4 => 4,
+                    5 => ['rty' => 3, 'fgh' => 4, 'asd' => 1, 'zxc' => 2],
+                    1 => 1,
+                    2 => 2,
+                ],
+                'asd' => 123,
+            ])
+        );
     }
 }
