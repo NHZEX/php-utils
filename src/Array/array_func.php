@@ -14,7 +14,7 @@ use function is_string;
  * @like https://www.php.net/manual/zh/function.array-multisort.php
  * @like https://blog.csdn.net/qq_35296546/article/details/78812176
  * @param array $arr
- * @param array<int, string|int> $args
+ * @param array $args
  * @return array
  */
 function array_multi_field_sort(array $arr, ...$args): array
@@ -27,4 +27,25 @@ function array_multi_field_sort(array $arr, ...$args): array
     $args[] = &$arr;
     call_user_func_array('\array_multisort', $args);
     return $arr;
+}
+
+/**
+ * @param array  $a
+ * @param string $previous
+ * @return array
+ */
+function array_flatten(array $a, string $previous = ''): array
+{
+    $mapping = [];
+    foreach ($a as $key => $value) {
+        if (!is_array($value)) {
+            $mapping[$previous . $key] = $value;
+        } else {
+            $mapping += array_flatten($value, $previous . $key . '_');
+        }
+    }
+    if (empty($previous)) {
+        ksort($mapping);
+    }
+    return $mapping;
 }
