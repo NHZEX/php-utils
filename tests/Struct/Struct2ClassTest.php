@@ -4,6 +4,7 @@ namespace Zxin\Tests\Struct;
 
 use Zxin\Stub\DataStructV2Stub;
 use Zxin\Tests\Base;
+use function json_encode;
 
 class Struct2ClassTest extends Base
 {
@@ -40,8 +41,14 @@ class Struct2ClassTest extends Base
         $stub->dynamic = 123;
         $this->assertEquals([
             'pub' => 1,
-            'dynamic' => 123,
         ], $stub->toArray());
+    }
+
+    public function testToJson()
+    {
+        $stub = new DataStructV2Stub();
+        $stub->pub = 2;
+        $this->assertEquals('{"pub":2}', json_encode($stub));
     }
 
     public function testPropExistCheck()
@@ -49,7 +56,6 @@ class Struct2ClassTest extends Base
         $ref = new \ReflectionClass(DataStructV2Stub::class);
         /** @var DataStructV2Stub $stub */
         $stub = $ref->newInstanceWithoutConstructor();
-        $stub->setPropExistCheck(true);
         $stub->__construct([
             'dynamic' => 123,
             'pub'     => 456,
@@ -57,10 +63,6 @@ class Struct2ClassTest extends Base
         $this->assertEquals([
             'pub' => 456,
         ], $stub->toArray());
-
-        /** @noinspection PhpUndefinedFieldInspection */
-        $stub->dynamic = 1234;
-        $this->assertFalse(isset($stub->dynamic));
 
         unset($stub->pub);
         $this->assertFalse(isset($stub->pub));

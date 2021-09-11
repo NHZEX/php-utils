@@ -17,11 +17,6 @@ abstract class BaseStruct implements JsonSerializable
     }
 
     /**
-     * @return bool
-     */
-    abstract public function checkPropExist(): bool;
-
-    /**
      * @return array
      */
     abstract public function getHiddenKey(): array;
@@ -29,9 +24,8 @@ abstract class BaseStruct implements JsonSerializable
     protected function load(?iterable $input)
     {
         if (!empty($input)) {
-            $propExistCheck = $this->checkPropExist();
             foreach ($input as $key => $value) {
-                if ($propExistCheck && !property_exists($this, $key)) {
+                if (!property_exists($this, $key)) {
                     continue;
                 }
                 $this->$key = $value;
@@ -84,7 +78,7 @@ abstract class BaseStruct implements JsonSerializable
 
     public function __set($name, $value)
     {
-        if ($this->checkPropExist() && !property_exists($this, $name)) {
+        if (!property_exists($this, $name)) {
             return;
         }
         $this->$name = $value;
@@ -92,7 +86,7 @@ abstract class BaseStruct implements JsonSerializable
 
     public function __unset($name)
     {
-        if ($this->checkPropExist() && !property_exists($this, $name)) {
+        if (!property_exists($this, $name)) {
             return;
         }
         $this->$name = null;
