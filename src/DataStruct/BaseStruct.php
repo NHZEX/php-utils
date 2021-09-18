@@ -6,12 +6,19 @@ use JsonSerializable;
 use function array_diff_key;
 use function array_flip;
 use function get_object_vars;
+use function is_iterable;
 use function property_exists;
 
 abstract class BaseStruct implements JsonSerializable
 {
-    public function __construct(?iterable $input = [])
+    /**
+     * @param null|iterable<string, mixed> $input
+     */
+    public function __construct($input = [])
     {
+        if (null !== $input && !is_iterable($input)) {
+            throw new \RuntimeException('input type must be iterable');
+        }
         $this->load($input);
         $this->initialize();
     }
