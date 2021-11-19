@@ -3,7 +3,12 @@
 namespace Zxin\Tests;
 
 use PHPUnit\Framework\TestCase;
+use function array_chunk;
+use function array_fill;
+use function array_rand;
+use function range;
 use function Zxin\Arr\array_flatten;
+use function Zxin\Arr\array_lazy_chunk;
 use function Zxin\Arr\array_multi_field_sort;
 
 class ArrTest extends TestCase
@@ -86,11 +91,6 @@ class ArrTest extends TestCase
         $this->assertEquals($expected, array_multi_field_sort($array1, ...$array2));
     }
 
-    /**
-     * @param array $expected
-     * @param array $array1
-     * @param array $array2
-     */
     public function testArrayFlatten()
     {
         $this->assertEquals(
@@ -134,5 +134,17 @@ class ArrTest extends TestCase
                 'asd' => 123,
             ])
         );
+    }
+
+    public function testArrayLazyChunk()
+    {
+        $array = range(0, 100, 1);
+
+        $result = [];
+        foreach (array_lazy_chunk($array, 10) as $item) {
+            $result[] = $item;
+        }
+
+        $this->assertEquals(array_chunk($array, 10, true), $result);
     }
 }

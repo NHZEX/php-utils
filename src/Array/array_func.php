@@ -2,6 +2,7 @@
 
 namespace Zxin\Arr;
 
+use Generator;
 use function array_column;
 use function call_user_func_array;
 use function is_string;
@@ -48,4 +49,23 @@ function array_flatten(array $a, string $previous = ''): array
         ksort($mapping);
     }
     return $mapping;
+}
+
+function array_lazy_chunk(iterable $items, int $limit): Generator
+{
+    $buffer = [];
+    $i = 0;
+    foreach ($items as $key => $item) {
+        $buffer[$key] = $item;
+        $i++;
+        if ($i >= $limit) {
+            yield $buffer;
+            $buffer = [];
+            $i = 0;
+        }
+    }
+
+    if (!empty($buffer)) {
+        yield $buffer;
+    }
 }
