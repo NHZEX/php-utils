@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Zxin\Tests;
 
 use PHPUnit\Framework\TestCase;
+use function Zxin\Str\str_fullwidth_to_ascii;
 use function Zxin\Str\strcut_omit;
 
 class StrTest extends TestCase
@@ -35,5 +36,31 @@ class StrTest extends TestCase
     public function testStrcutOmit(string $expected, string $string1, int $len, string $dot = '...')
     {
         $this->assertEquals($expected, strcut_omit($string1, $len, $dot));
+    }
+
+    public function strFullwidthToAsciiProvider()
+    {
+        return [
+            ['　', ' '], ['！', '!'], ['＂', '"'], ['＃', '#'], ['＄', '$'], ['％', '%'], ['＆', '&'], ['＇', '\''],
+            ['（', '('], ['）', ')'], ['＊', '*'], ['＋', '+'], ['，', ','], ['－', '-'], ['．', '.'], ['／', '/'],
+            ['０', '0'], ['１', '1'], ['２', '2'], ['３', '3'], ['４', '4'], ['５', '5'], ['６', '6'], ['７', '7'], ['８', '8'], ['９', '9'],
+            ['：', ':'], ['；', ';'], ['＜', '<'], ['＝', '='], ['＞', '>'], ['？', '?'], ['＠', '@'],
+            ['Ａ', 'A'], ['Ｂ', 'B'], ['Ｃ', 'C'], ['Ｄ', 'D'], ['Ｅ', 'E'], ['Ｆ', 'F'], ['Ｇ', 'G'], ['Ｈ', 'H'], ['Ｉ', 'I'], ['Ｊ', 'J'], ['Ｋ', 'K'], ['Ｌ', 'L'], ['Ｍ', 'M'],
+            ['Ｎ', 'N'], ['Ｏ', 'O'], ['Ｐ', 'P'], ['Ｑ', 'Q'], ['Ｒ', 'R'], ['Ｓ', 'S'], ['Ｔ', 'T'], ['Ｕ', 'U'], ['Ｖ', 'V'], ['Ｗ', 'W'], ['Ｘ', 'X'], ['Ｙ', 'Y'], ['Ｚ', 'Z'],
+            ['［', '['], ['＼', '\\'], ['］', ']'], ['＾', '^'], ['＿', '_'], ['｀', '`'],
+            ['ａ', 'a'], ['ｂ', 'b'], ['ｃ', 'c'], ['ｄ', 'd'], ['ｅ', 'e'], ['ｆ', 'f'], ['ｇ', 'g'], ['ｈ', 'h'], ['ｉ', 'i'], ['ｊ', 'j'], ['ｋ', 'k'], ['ｌ', 'l'], ['ｍ', 'm'],
+            ['ｎ', 'n'], ['ｏ', 'o'], ['ｐ', 'p'], ['ｑ', 'q'], ['ｒ', 'r'], ['ｓ', 's'], ['ｔ', 't'], ['ｕ', 'u'], ['ｖ', 'v'], ['ｗ', 'w'], ['ｘ', 'x'], ['ｙ', 'y'], ['ｚ', 'z'],
+            ['｛', '{'], ['｜', '|'], ['｝', '}'], ['～', '~'],
+        ];
+    }
+
+    /**
+     * @dataProvider strFullwidthToAsciiProvider
+     * @param string $fullwidth
+     * @param string $ascii
+     */
+    public function testStrFullwidthToAscii(string $fullwidth, string $ascii)
+    {
+        $this->assertEquals($ascii, str_fullwidth_to_ascii($fullwidth));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Zxin\Str;
 
+use IntlChar;
 use function max;
 use function mb_internal_encoding;
 use function mb_strcut;
@@ -26,4 +27,19 @@ function strcut_omit(string $string, int $bytes, string $dot = '...', ?string $c
     }
 
     return $string;
+}
+
+/**
+ * @param string $input
+ * @return string
+ */
+function str_fullwidth_to_ascii(string $input): string
+{
+    return preg_replace_callback("/[\x{3000}|\x{FF01}-\x{FF5E}]/u", function ($match) {
+        $str = $match[0];
+        if ("\u{3000}" === $str) {
+            return ' ';
+        }
+        return chr(IntlChar::ord($str) - 0xFEE0);
+    }, $input);
 }

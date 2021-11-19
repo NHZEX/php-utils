@@ -19,6 +19,7 @@
     "require-dev": {
         "ext-bcmath": "*",
         "ext-mbstring": "*",
+        "ext-intl": "*",
         "friendsofphp/php-cs-fixer": "^2.18",
         "phpunit/phpunit": "^7|^8|^9",
         "symfony/var-dumper": "^4.2|^5.1"
@@ -27,6 +28,7 @@
         "ext-bcmath": "unit convertor support",
         "ext-posix": "posix",
         "ext-mbstring": "mbstring",
+        "ext-intl": "string",
         "symfony/var-dumper": "debug tool support"
     },
     "autoload": {
