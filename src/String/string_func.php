@@ -41,6 +41,8 @@ function str_fullwidth_to_ascii(string $input): string
         if ("\u{3000}" === $str) {
             return ' ';
         }
+
+        // 资料：https://zh.wikipedia.org/wiki/%E5%85%A8%E5%BD%A2%E5%92%8C%E5%8D%8A%E5%BD%A2
         return mb_chr(mb_ord($str) - 0xFEE0, 'UTF-8');
     }, $input);
 }
