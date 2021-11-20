@@ -2,9 +2,10 @@
 
 namespace Zxin\Str;
 
-use IntlChar;
 use function max;
+use function mb_chr;
 use function mb_internal_encoding;
+use function mb_ord;
 use function mb_strcut;
 use function strlen;
 
@@ -40,6 +41,6 @@ function str_fullwidth_to_ascii(string $input): string
         if ("\u{3000}" === $str) {
             return ' ';
         }
-        return chr(IntlChar::ord($str) - 0xFEE0);
+        return mb_chr(mb_ord($str) - 0xFEE0, 'UTF-8');
     }, $input);
 }
