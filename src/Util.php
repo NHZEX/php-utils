@@ -91,11 +91,9 @@ class Util
     }
 
     /**
-     * @param int $byte
-     * @param int $dec
-     * @return string
+     * 自动格式化可读字节单位
      */
-    public static function formatByte(int $byte, int $dec = 2): string
+    public static function formatByte(float $byte, int $dec = 2, bool $unit = true): string
     {
         $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
         $count = count($units) - 1;
@@ -108,6 +106,10 @@ class Util
 
         $result = sprintf('%.2f', round($byte, $dec));
 
-        return "{$result} {$units[$pos]}";
+        if ($unit) {
+            return "{$result} {$units[$pos]}";
+        } else {
+            return $result;
+        }
     }
 }
