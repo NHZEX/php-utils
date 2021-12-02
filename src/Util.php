@@ -9,11 +9,14 @@ declare(strict_types=1);
 
 namespace Zxin;
 
+use function count;
 use function extension_loaded;
 use function lcfirst;
 use function posix_geteuid;
 use function posix_getpwuid;
 use function preg_replace;
+use function round;
+use function sprintf;
 use function str_replace;
 use function strtolower;
 use function ucwords;
@@ -85,5 +88,26 @@ class Util
             return 'null';
         }
         return posix_getpwuid(posix_geteuid())['name'];
+    }
+
+    /**
+     * @param int $byte
+     * @param int $dec
+     * @return string
+     */
+    public static function formatByte(int $byte, int $dec = 2): string
+    {
+        $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+        $count = count($units) - 1;
+        $pos  = 0;
+
+        while ($byte >= 1024 && $pos < $count) {
+            $byte /= 1024;
+            $pos++;
+        }
+
+        $result = sprintf('%.2f', round($byte, $dec));
+
+        return "{$result} {$units[$pos]}";
     }
 }
