@@ -6,6 +6,7 @@ namespace Zxin\Util;
 
 use Exception;
 use RuntimeException;
+use Zxin\Util;
 use function base64_decode;
 use function base64_encode;
 use function bin2hex;
@@ -75,21 +76,7 @@ function uuidv4(): string
  */
 function format_byte(int $byte, int $dec = 2): string
 {
-    $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
-    $count = count($units) - 1;
-    $pos  = 0;
-
-    $minus = $byte < 0;
-    $byte = abs($byte);
-
-    while ($byte >= 1024 && $pos < $count) {
-        $byte /= 1024;
-        $pos++;
-    }
-
-    $result = sprintf('%.2f', round($byte * ($minus ? -1 : 1), $dec));
-
-    return "{$result} {$units[$pos]}";
+    return Util::formatByte($byte, $dec);
 }
 
 function get_temp_dir(): string
