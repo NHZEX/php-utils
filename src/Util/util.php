@@ -91,3 +91,21 @@ function format_byte(int $byte, int $dec = 2): string
 
     return "{$result} {$units[$pos]}";
 }
+
+function get_temp_dir(): string
+{
+    if (is_dir('/dev/shm') && is_writable('/dev/shm')) {
+        $cacheDir = '/dev/shm';
+    } elseif (is_dir('/run/shm') && is_writable('/run/shm')) {
+        $cacheDir = '/run/shm';
+    } else {
+        $cacheDir = sys_get_temp_dir();
+    }
+
+    return $cacheDir;
+}
+
+function get_temp_filename(string $prefix, string $suffix): string
+{
+    return get_temp_dir() . DIRECTORY_SEPARATOR . uniqid($prefix, true) . $suffix;
+}
