@@ -46,3 +46,13 @@ function str_fullwidth_to_ascii(string $input): string
         return mb_chr(mb_ord($str) - 0xFEE0, 'UTF-8');
     }, $input);
 }
+
+/**
+ * @param string|string[] $search
+ * @param string $replace
+ * @return string|string[]
+ */
+function str_trim_nbsp($search, string $replace = '')
+{
+    return str_replace("\xc2\xa0", $replace, $search);
+}
