@@ -4,6 +4,7 @@ namespace Zxin\Arr;
 
 use Generator;
 use function array_column;
+use function array_reverse;
 use function call_user_func_array;
 use function is_string;
 
@@ -51,12 +52,16 @@ function array_flatten(array $a, string $previous = ''): array
     return $mapping;
 }
 
-function array_lazy_chunk(iterable $items, int $limit): Generator
+function array_lazy_chunk(iterable $items, int $limit, bool $preserveKeys = true): Generator
 {
     $buffer = [];
     $i = 0;
     foreach ($items as $key => $item) {
-        $buffer[$key] = $item;
+        if ($preserveKeys) {
+            $buffer[$key] = $item;
+        } else {
+            $buffer[] = $item;
+        }
         $i++;
         if ($i >= $limit) {
             yield $buffer;
