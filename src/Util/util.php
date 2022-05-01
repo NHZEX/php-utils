@@ -18,6 +18,7 @@ use function str_repeat;
 use function str_split;
 use function strlen;
 use function strtr;
+use function sys_get_temp_dir;
 use function vsprintf;
 use function count;
 use function abs;
@@ -79,8 +80,12 @@ function format_byte(int $byte, int $dec = 2): string
     return Util::formatByte($byte, $dec);
 }
 
-function get_temp_dir(): string
+function get_temp_dir(bool $alwaysUseTempDir = false): string
 {
+    if ($alwaysUseTempDir) {
+        return sys_get_temp_dir();
+    }
+
     if (is_dir('/dev/shm') && is_writable('/dev/shm')) {
         $cacheDir = '/dev/shm';
     } elseif (is_dir('/run/shm') && is_writable('/run/shm')) {
@@ -92,7 +97,7 @@ function get_temp_dir(): string
     return $cacheDir;
 }
 
-function get_temp_filename(string $prefix, string $suffix): string
+function get_temp_filename(string $prefix, string $suffix, bool $alwaysUseTempDir = false): string
 {
-    return get_temp_dir() . DIRECTORY_SEPARATOR . uniqid($prefix, true) . $suffix;
+    return get_temp_dir($alwaysUseTempDir) . DIRECTORY_SEPARATOR . uniqid($prefix, true) . $suffix;
 }
