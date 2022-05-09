@@ -80,9 +80,9 @@ function format_byte(int $byte, int $dec = 2): string
     return Util::formatByte($byte, $dec);
 }
 
-function get_temp_dir(bool $alwaysUseTempDir = false): string
+function get_temp_dir(bool $allowShmDir = false): string
 {
-    if ($alwaysUseTempDir) {
+    if (!$allowShmDir) {
         return sys_get_temp_dir();
     }
 
@@ -97,7 +97,7 @@ function get_temp_dir(bool $alwaysUseTempDir = false): string
     return $cacheDir;
 }
 
-function get_temp_filename(string $prefix, string $suffix, bool $alwaysUseTempDir = false): string
+function get_temp_filename(string $prefix, string $suffix, bool $allowShmDir = false): string
 {
-    return get_temp_dir($alwaysUseTempDir) . DIRECTORY_SEPARATOR . uniqid($prefix, true) . $suffix;
+    return get_temp_dir($allowShmDir) . DIRECTORY_SEPARATOR . uniqid($prefix, true) . $suffix;
 }
