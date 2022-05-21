@@ -52,6 +52,13 @@ function array_flatten(array $a, string $previous = ''): array
     return $mapping;
 }
 
+/**
+ * @template T
+ * @param iterable<T> $items
+ * @param int $limit
+ * @param bool $preserveKeys
+ * @return Generator<int, array<T>>
+ */
 function array_lazy_chunk(iterable $items, int $limit, bool $preserveKeys = true): Generator
 {
     $buffer = [];
@@ -73,4 +80,20 @@ function array_lazy_chunk(iterable $items, int $limit, bool $preserveKeys = true
     if (!empty($buffer)) {
         yield $buffer;
     }
+}
+
+/**
+ * @template T
+ * @param array<T> $arr
+ * @param callable(T): int|string $cb
+ * @return array<int|string, T>
+ */
+function array_index_cb(array $arr, callable $cb): array
+{
+    $output = [];
+    foreach ($arr as $item) {
+        $output[$cb($item)] = $item;
+    }
+
+    return $output;
 }
