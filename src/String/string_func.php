@@ -56,3 +56,8 @@ function str_trim_nbsp($search, string $replace = '')
 {
     return str_replace("\xc2\xa0", $replace, $search);
 }
+
+function str_is_ascii(string $str): bool
+{
+    return mb_check_encoding($str, 'ASCII');
+}
