@@ -10,11 +10,11 @@
         }
     ],
     "require": {
-        "php": "^7.1|^8.0",
+        "php": "^7.2|^8.0",
         "ext-json": "*",
         "ext-openssl": "*",
-        "symfony/polyfill-php72": "^1.22",
-        "symfony/polyfill-php73": "^1.22"
+        "symfony/polyfill-php73": "^1.22",
+        "symfony/polyfill-php74": "^1.22"
     },
     "require-dev": {
         "ext-bcmath": "*",
