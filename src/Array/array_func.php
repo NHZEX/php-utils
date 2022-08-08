@@ -3,10 +3,14 @@
 namespace Zxin\Arr;
 
 use Generator;
+
 use function array_column;
 use function array_reverse;
 use function call_user_func_array;
 use function is_string;
+use function is_array;
+use function ksort;
+use function is_callable;
 
 /**
  * 多维数组指定多字段排序

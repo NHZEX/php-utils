@@ -7,6 +7,7 @@ namespace Zxin\Util;
 use Exception;
 use RuntimeException;
 use Zxin\Util;
+
 use function base64_decode;
 use function base64_encode;
 use function bin2hex;
@@ -24,6 +25,9 @@ use function count;
 use function abs;
 use function sprintf;
 use function round;
+use function is_dir;
+use function is_writable;
+use function uniqid;
 
 /**
  * Base64 Url安全编码

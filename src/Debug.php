@@ -8,6 +8,12 @@ use ReflectionFunction;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
+use function var_export;
+use function is_array;
+use function is_object;
+use function get_class;
+use function spl_object_id;
+
 class Debug
 {
     /**

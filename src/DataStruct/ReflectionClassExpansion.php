@@ -4,6 +4,7 @@ namespace Zxin\DataStruct;
 
 use ReflectionClass;
 use RuntimeException;
+
 use function fclose;
 use function feof;
 use function fgets;

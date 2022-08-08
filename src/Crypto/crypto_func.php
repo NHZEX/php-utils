@@ -6,6 +6,7 @@ namespace Zxin\Crypto;
 
 use LengthException;
 use RuntimeException;
+
 use function hash_equals;
 use function hash_hmac;
 use function http_build_query;
