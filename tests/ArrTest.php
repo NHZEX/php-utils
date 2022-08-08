@@ -4,13 +4,10 @@ namespace Zxin\Tests;
 
 use PHPUnit\Framework\TestCase;
 use function array_chunk;
-use function array_fill;
-use function array_rand;
 use function range;
-use function var_dump;
-use function var_export;
 use function Zxin\Arr\array_flatten;
 use function Zxin\Arr\array_group;
+use function Zxin\Arr\array_index_cb;
 use function Zxin\Arr\array_lazy_chunk;
 use function Zxin\Arr\array_multi_field_sort;
 
@@ -149,6 +146,29 @@ class ArrTest extends TestCase
         }
 
         $this->assertEquals(array_chunk($array, 10, true), $result);
+    }
+
+    public function testArrayIndexCallBack()
+    {
+        $items = [
+            ['k' => 'a', 'i' => 1],
+            ['k' => 'b', 'i' => 2],
+            ['k' => 'b', 'i' => 3],
+            ['k' => 'c', 'i' => 4],
+            ['k' => 'c', 'i' => 5],
+        ];
+
+        $output = array_index_cb($items, function ($val, $key) {
+            return $val['i'] . $val['k'] . $key;
+        });
+
+        $this->assertEquals([
+            '1a0' => ['k' => 'a', 'i' => 1],
+            '2b1' => ['k' => 'b', 'i' => 2],
+            '3b2' => ['k' => 'b', 'i' => 3],
+            '4c3' => ['k' => 'c', 'i' => 4],
+            '5c4' => ['k' => 'c', 'i' => 5],
+        ], $output);
     }
 
     public function testArrayGroup()

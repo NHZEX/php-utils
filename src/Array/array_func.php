@@ -3,14 +3,12 @@
 namespace Zxin\Arr;
 
 use Generator;
-
 use function array_column;
-use function array_reverse;
 use function call_user_func_array;
-use function is_string;
 use function is_array;
-use function ksort;
 use function is_callable;
+use function is_string;
+use function ksort;
 
 /**
  * 多维数组指定多字段排序
@@ -88,15 +86,16 @@ function array_lazy_chunk(iterable $items, int $limit, bool $preserveKeys = true
 
 /**
  * @template T
- * @param array<T> $arr
- * @param callable(T): int|string $cb
+ * @template K
+ * @param array<K, T> $arr
+ * @param callable(T, K): int|string $cb
  * @return array<int|string, T>
  */
 function array_index_cb(array $arr, callable $cb): array
 {
     $output = [];
-    foreach ($arr as $item) {
-        $output[$cb($item)] = $item;
+    foreach ($arr as $key => $item) {
+        $output[$cb($item, $key)] = $item;
     }
 
     return $output;
