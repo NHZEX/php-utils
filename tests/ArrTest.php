@@ -7,7 +7,10 @@ use function array_chunk;
 use function array_fill;
 use function array_rand;
 use function range;
+use function var_dump;
+use function var_export;
 use function Zxin\Arr\array_flatten;
+use function Zxin\Arr\array_group;
 use function Zxin\Arr\array_lazy_chunk;
 use function Zxin\Arr\array_multi_field_sort;
 
@@ -146,5 +149,80 @@ class ArrTest extends TestCase
         }
 
         $this->assertEquals(array_chunk($array, 10, true), $result);
+    }
+
+    public function testArrayGroup()
+    {
+        $items = [
+            ['k' => 'a', 'i' => 1],
+            ['k' => 'b', 'i' => 2],
+            ['k' => 'b', 'i' => 3],
+            ['k' => 'c', 'i' => 4],
+            ['k' => 'c', 'i' => 5],
+        ];
+
+        $output = array_group($items, 'k');
+
+        $this->assertEquals([
+            'a' => [
+                0 => ['k' => 'a', 'i' => 1],
+            ],
+            'b' => [
+                1 => ['k' => 'b', 'i' => 2],
+                2 => ['k' => 'b', 'i' => 3],
+            ],
+            'c' => [
+                3 => ['k' => 'c', 'i' => 4],
+                4 => ['k' => 'c', 'i' => 5],
+            ],
+        ], $output);
+
+        $output = array_group($items, function ($item) {
+            return $item['i'] % 2;
+        });
+
+        $this->assertEquals([
+            0 => [
+                1 => ['k' => 'b', 'i' => 2],
+                3 => ['k' => 'c', 'i' => 4],
+            ],
+            1 => [
+                0 => ['k' => 'a', 'i' => 1],
+                2 => ['k' => 'b', 'i' => 3],
+                4 => ['k' => 'c', 'i' => 5],
+            ],
+        ], $output);
+
+        $output = array_group($items, function ($_, $key) {
+            return $key % 2 ? 'a' : 'b';
+        });
+
+        $this->assertEquals([
+            'b' => [
+                0 => ['k' => 'a', 'i' => 1],
+                2 => ['k' => 'b', 'i' => 3],
+                4 => ['k' => 'c', 'i' => 5],
+            ],
+            'a' => [
+                1 => ['k' => 'b', 'i' => 2],
+                3 => ['k' => 'c', 'i' => 4],
+            ],
+        ], $output);
+
+        $output = array_group($items, function ($_, $key) {
+            return $key % 2 ? 'a' : 'b';
+        }, false);
+
+        $this->assertEquals([
+            'b' => [
+                ['k' => 'a', 'i' => 1],
+                ['k' => 'b', 'i' => 3],
+                ['k' => 'c', 'i' => 5],
+            ],
+            'a' => [
+                ['k' => 'b', 'i' => 2],
+                ['k' => 'c', 'i' => 4],
+            ],
+        ], $output);
     }
 }

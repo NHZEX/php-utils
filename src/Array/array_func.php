@@ -97,3 +97,31 @@ function array_index_cb(array $arr, callable $cb): array
 
     return $output;
 }
+
+/**
+ * @param iterable            $arr
+ * @param int|string|callable $groupKey
+ * @param bool                $preserveKeys
+ * @return array
+ */
+function array_group(iterable $arr, $groupKey, bool $preserveKeys = true): array
+{
+    $isCall = is_callable($groupKey);
+    $output = [];
+
+    foreach ($arr as $k => $item) {
+        if ($isCall) {
+            $key = $groupKey($item, $k);
+        } else {
+            $key = $item[$groupKey];
+        }
+
+        if ($preserveKeys) {
+            $output[$key][$k] = $item;
+        } else {
+            $output[$key][] = $item;
+        }
+    }
+
+    return $output;
+}
