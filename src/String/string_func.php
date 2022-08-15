@@ -3,14 +3,14 @@
 namespace Zxin\Str;
 
 use function max;
+use function mb_check_encoding;
 use function mb_chr;
 use function mb_internal_encoding;
 use function mb_ord;
 use function mb_strcut;
-use function strlen;
 use function preg_replace_callback;
 use function str_replace;
-use function mb_check_encoding;
+use function strlen;
 
 /**
  * 支持多字节字符串按照字节长度进行截取
@@ -62,5 +62,8 @@ function str_trim_nbsp($search, string $replace = '')
 
 function str_is_ascii(string $str): bool
 {
+    if ('' === $str) {
+        return true;
+    }
     return mb_check_encoding($str, 'ASCII');
 }
