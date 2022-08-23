@@ -7,27 +7,25 @@ namespace Zxin\Util;
 use Exception;
 use RuntimeException;
 use Zxin\Util;
-
 use function base64_decode;
 use function base64_encode;
 use function bin2hex;
 use function chr;
+use function is_dir;
+use function is_writable;
+use function ltrim;
 use function ord;
 use function random_bytes;
 use function rtrim;
 use function str_repeat;
+use function str_replace;
 use function str_split;
+use function strip_tags;
 use function strlen;
 use function strtr;
 use function sys_get_temp_dir;
-use function vsprintf;
-use function count;
-use function abs;
-use function sprintf;
-use function round;
-use function is_dir;
-use function is_writable;
 use function uniqid;
+use function vsprintf;
 
 /**
  * Base64 Url安全编码
@@ -104,4 +102,16 @@ function get_temp_dir(bool $allowShmDir = false): string
 function get_temp_filename(string $prefix, string $suffix, bool $allowShmDir = false): string
 {
     return get_temp_dir($allowShmDir) . DIRECTORY_SEPARATOR . uniqid($prefix, true) . $suffix;
+}
+
+/**
+ * @param string|string[]|null $allowable_tags
+ * @link https://stackoverflow.com/a/38200395
+ */
+function strip_tags_with_whitespace(string $string, $allowable_tags = null): string
+{
+    $string = str_replace('<', ' <', $string);
+    $string = strip_tags($string, $allowable_tags);
+    $string = str_replace('  ', ' ', $string);
+    return ltrim($string, ' ');
 }

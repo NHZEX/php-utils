@@ -11,6 +11,7 @@ use function mb_strcut;
 use function preg_replace_callback;
 use function str_replace;
 use function strlen;
+use function strtr;
 
 /**
  * 支持多字节字符串按照字节长度进行截取
@@ -66,4 +67,28 @@ function str_is_ascii(string $str): bool
         return true;
     }
     return mb_check_encoding($str, 'ASCII');
+}
+
+/**
+ * Replace all characters with an ASCII equivalent.
+ * @param  string $str       Original string converted
+ */
+function str_replace_umlaut_unaccent(string $str): ?string
+{
+    // https://gist.github.com/niquenen/d06a55ddf11f4a08a421750c2ccb96b6
+    $char = [
+        'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A',
+        'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C',
+        'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I',
+        'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O',
+        'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U',
+        'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'à'=>'a', 'á'=>'a', 'â'=>'a',
+        'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e',
+        'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i',
+        'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o',
+        'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u',
+        'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y', 'ß'=>'ss'
+    ];
+
+    return strtr($str, $char);
 }
