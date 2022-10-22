@@ -4,11 +4,11 @@ namespace Zxin\DataStruct;
 
 use JsonSerializable;
 use RuntimeException;
-
 use function array_diff_key;
 use function array_flip;
 use function get_object_vars;
 use function is_iterable;
+use function json_encode;
 use function property_exists;
 
 abstract class BaseStruct implements JsonSerializable
@@ -72,6 +72,16 @@ abstract class BaseStruct implements JsonSerializable
             $data  = array_diff_key($data, $hiddenKey);
         }
         return $data;
+    }
+
+    /**
+     * @return false|string
+     */
+    public function toJson(
+        int $flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+        int $depth = 512
+    ) {
+        return json_encode($this, $flags, $depth);
     }
 
     /**
