@@ -76,6 +76,7 @@ function str_is_ascii(string $str): bool
 function str_replace_umlaut_unaccent(string $str): ?string
 {
     // https://gist.github.com/niquenen/d06a55ddf11f4a08a421750c2ccb96b6
+    // https://docs.oracle.com/cd/E29584_01/webhelp/mdex_basicDev/src/rbdv_chars_mapping.html // 考虑参考更新映射
     $char = [
         'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A',
         'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C',
@@ -87,7 +88,8 @@ function str_replace_umlaut_unaccent(string $str): ?string
         'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i',
         'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o',
         'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u',
-        'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y', 'ß'=>'ss'
+        'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y',
+        'ß'=>'s', // 映射由`ss`改为`s`
     ];
 
     return strtr($str, $char);
