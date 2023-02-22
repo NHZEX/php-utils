@@ -128,3 +128,20 @@ function array_group(iterable $arr, $groupKey, bool $preserveKeys = true): array
 
     return $output;
 }
+
+/**
+ * @template TK of string|int
+ * @template TV of mixed
+ * @param callable $cb
+ * @param array<TK, TV> $arr
+ * @return array<TK, mixed>
+ */
+function array_map_with_key(callable $cb, array $arr): array
+{
+    $out = [];
+    foreach ($arr as $k => $v) {
+        $out[$k] = $cb($v, $k);
+    }
+
+    return $out;
+}
