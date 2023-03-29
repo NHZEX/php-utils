@@ -104,7 +104,7 @@ class Util
             $pos++;
         }
 
-        $result = sprintf('%.2f', round($byte, $dec));
+        $result = sprintf("%.{$dec}f", round($byte, $dec));
 
         if ($unit) {
             return "{$result} {$units[$pos]}";
