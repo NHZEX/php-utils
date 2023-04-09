@@ -2,6 +2,7 @@
 
 namespace Zxin\Tests;
 
+use Generator;
 use Zxin\Util;
 use function hex2bin;
 use function strlen;
@@ -107,5 +108,36 @@ class UtilTest extends Base
     {
         $uuid = Util\uuidv4();
         $this->assertEquals(36, strlen($uuid));
+    }
+
+
+    public function parseStrToIpAndPortProvider(): Generator
+    {
+        yield ['0.0.0.0', true];
+        yield ['127.0.0.1', true];
+        yield ['127.0.0.1:8080', true];
+        yield ['127.0.0.1:-1', false];
+        yield ['127.0.0.1:99999', false];
+        yield ['127.0.0.1:aaa', false];
+        yield ['aaa:80', false];
+        yield ['[::]:80', true];
+        yield ['[::1]:80', true];
+        yield ['[::1]', true];
+        yield ['::1', false];
+        yield ['::1:80', true];
+        yield ['2001:0db8:85a3:0000:0000:8a2e:0370:7334:80', true];
+        yield ['[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:80', true];
+        yield ['[aaa]:80', false];
+    }
+
+    /**
+     * @dataProvider parseStrToIpAndPortProvider
+     * @param string $str
+     * @return void
+     */
+    public function testParseStrToIpAndPort(string $str, bool $valid): void
+    {
+        $result = Util\parse_str_to_ip_and_port($str);
+        $this->assertEquals($valid, $result !== null);
     }
 }

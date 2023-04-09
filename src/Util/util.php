@@ -11,6 +11,7 @@ use function base64_decode;
 use function base64_encode;
 use function bin2hex;
 use function chr;
+use function filter_var;
 use function is_dir;
 use function is_writable;
 use function ltrim;
@@ -22,7 +23,9 @@ use function str_replace;
 use function str_split;
 use function strip_tags;
 use function strlen;
+use function strrpos;
 use function strtr;
+use function substr;
 use function sys_get_temp_dir;
 use function uniqid;
 use function vsprintf;
@@ -114,4 +117,38 @@ function strip_tags_with_whitespace(string $string, $allowable_tags = null): str
     $string = strip_tags($string, $allowable_tags);
     $string = str_replace('  ', ' ', $string);
     return ltrim($string, ' ');
+}
+
+function parse_str_to_ip_and_port(string $str): ?array
+{
+    if (empty($str)) {
+        return null;
+    }
+    // ipv6
+    if (($pos = strrpos($str, ']')) !== false) {
+        $ip = substr($str, 1, $pos - 1);
+        $port = substr($str, $pos + 2);
+    } elseif (($pos = strrpos($str, ':')) !== false) {
+        $ip = substr($str, 0, $pos);
+        $port = substr($str, $pos + 1);
+    } else {
+        $ip = $str;
+        $port = '';
+    }
+
+    if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        return null;
+    }
+    // 验证是有效的端口号范围
+    if (
+        $port
+        && !filter_var(
+            $port,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1, 'max_range' => 65535]]
+        )
+    ) {
+        return null;
+    }
+    return [$ip, $port];
 }
