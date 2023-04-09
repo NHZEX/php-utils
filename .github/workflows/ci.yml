@@ -13,6 +13,8 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
+          - 8.1
+          - 8.2
         prefer-lowest: [false]
 
     steps:
@@ -30,6 +32,7 @@ jobs:
         run: |
           php -v
           php -m
+          php --ri openssl
           composer -V
 
       - name: Validate composer.json and composer.lock

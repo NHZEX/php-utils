@@ -6,7 +6,6 @@ namespace Zxin\Crypto;
 
 use LengthException;
 use RuntimeException;
-
 use function hash_equals;
 use function hash_hmac;
 use function http_build_query;
@@ -69,15 +68,15 @@ function encrypt_data(string $data, string $password, string $method = 'aes-128-
 
     $iv = '';
     $tag = '';
-    $parame = [];
+    $params = [];
     $ivSize = openssl_cipher_iv_length($method);
     if (!empty($ivSize)) {
         $iv = openssl_random_pseudo_bytes($ivSize);
     }
     if (str_ends_with($method, 'gcm') || str_ends_with($method, 'ccm') || str_ends_with($method, 'ocb')) {
-        $parame = [&$tag, $add, 16];
+        $params = [&$tag, $add, 16];
     }
-    $output = openssl_encrypt($data, $method, $password, OPENSSL_RAW_DATA, $iv, ...$parame);
+    $output = openssl_encrypt($data, $method, $password, OPENSSL_RAW_DATA, $iv, ...$params);
     if (false === $output) {
         throw new RuntimeException("openssl encrypt [$method] failure: " . openssl_error_string());
     }
@@ -101,12 +100,12 @@ function decrypt_data(string $data, string $password, string $method = 'aes-128-
             substr($data, $ivSize, 16),
             substr($data, $ivSize + 16)
         ];
-        $parame = [$iv, $tag, $add];
+        $params = [$iv, $tag, $add];
     } else {
         [$iv, $data] = [substr($data, 0, $ivSize), substr($data, $ivSize)];
-        $parame = [$iv];
+        $params = [$iv];
     }
-    $output = openssl_decrypt($data, $method, $password, OPENSSL_RAW_DATA, ...$parame);
+    $output = openssl_decrypt($data, $method, $password, OPENSSL_RAW_DATA, ...$params);
     if (false === $output) {
         throw new RuntimeException("openssl decrypt [$method] failure: " . openssl_error_string());
     }

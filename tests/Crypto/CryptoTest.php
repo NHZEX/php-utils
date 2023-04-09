@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use function openssl_random_pseudo_bytes;
 use function str_ends_with;
 use function str_repeat;
+use function str_starts_with;
 use function strtolower;
 use function Zxin\Crypto\aes_gcm_decrypt;
 use function Zxin\Crypto\aes_gcm_encrypt;
@@ -48,22 +49,46 @@ class CryptoTest extends TestCase
         $ignoreMethodSuffix = [
             'wrap',
             'wrap-pad',
+            'wrap-inv',
+            'wrap-pad-inv',
+            'siv',
+            'cts',
+        ];
+        // ci test openssl-v3 not support
+        $ignoreMethodPrefix = [
+            'des',
+            'bf',
+            'rc2',
+            'rc4',
+            'cast5',
+            'seed',
+            'chacha20',
         ];
         if (70413 > PHP_VERSION_ID) {
             // aead mode bug https://bugs.php.net/bug.php?id=77156
             $ignoreMethodSuffix[] = 'ocb';
         }
         foreach (openssl_get_cipher_methods() as $method) {
+            if (empty($method) || 'null' === $method) {
+                // ci test 环境存在字符串 null
+                continue;
+            }
+            foreach ($ignoreMethodPrefix as $prefix) {
+                if (str_starts_with(strtolower($method), $prefix)) {
+                    echo '> not support openssl method: ' . $method . PHP_EOL;
+                    continue 2;
+                }
+            }
             foreach ($ignoreMethodSuffix as $suffix) {
                 if (str_ends_with(strtolower($method), $suffix)) {
                     echo '> not support openssl method: ' . $method . PHP_EOL;
                     continue 2;
                 }
             }
-            yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(8), $method];
-            yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(32), $method];
-            yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(64), $method];
-            yield [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(128), $method];
+            yield "$method-8" => [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(8), $method];
+            yield "$method-32" => [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(32), $method];
+            yield "$method-64" => [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(64), $method];
+            yield "$method-128" => [openssl_random_pseudo_bytes(64), openssl_random_pseudo_bytes(128), $method];
         }
     }
 
