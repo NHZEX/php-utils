@@ -3,5 +3,6 @@
 /runtime
 composer.lock
 .php-cs-fixer.cache
+.php_cs.cache
 .phpunit.result.cache
 /*.phar
