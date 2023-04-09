@@ -6,6 +6,7 @@ namespace Zxin\DataStruct;
 
 use ArrayAccess;
 use JsonSerializable;
+use ReturnTypeWillChange;
 use function array_diff_key;
 use function array_flip;
 use function get_object_vars;
@@ -94,7 +95,7 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
      * @param string $offset An offset to check for.
      * @return bool true on success or false on failure.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return property_exists($this, $offset);
@@ -106,7 +107,7 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
      * @param string $offset The offset to retrieve.
      * @return mixed Can return all value types.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function &offsetGet($offset)
     {
         return $this->$offset;
@@ -119,7 +120,7 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
      * @param mixed $value  The value to set.
      * @return void
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->__set($offset, $value);
@@ -131,7 +132,7 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
      * @param string $offset The offset to unset.
      * @return void
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->__unset($offset);
@@ -158,7 +159,7 @@ abstract class BaseProperty implements ArrayAccess, JsonSerializable
      * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
      * @return array data which can be serialized by json_encode, which is a value of any type other than a resource.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

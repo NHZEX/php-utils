@@ -6,7 +6,6 @@ use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
 use Rector\Config\RectorConfig;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\LevelSetList;
-use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -24,7 +23,7 @@ return static function (RectorConfig $rectorConfig): void {
     // define sets of rules
     $rectorConfig->sets([
         // SetList::CODE_QUALITY,
-        LevelSetList::UP_TO_PHP_72
+        LevelSetList::UP_TO_PHP_73,
     ]);
 
     $rectorConfig->phpVersion(PhpVersion::PHP_72);
