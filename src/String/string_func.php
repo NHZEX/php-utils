@@ -73,7 +73,7 @@ function str_is_ascii(string $str): bool
  * Replace all characters with an ASCII equivalent.
  * @param  string $str       Original string converted
  */
-function str_replace_umlaut_unaccent(string $str): ?string
+function str_replace_umlaut_unaccent(string $str): string
 {
     // https://gist.github.com/niquenen/d06a55ddf11f4a08a421750c2ccb96b6
     // https://docs.oracle.com/cd/E29584_01/webhelp/mdex_basicDev/src/rbdv_chars_mapping.html // 考虑参考更新映射

@@ -22,6 +22,7 @@ function ref_get_prop($object, string $prop): Property
 
 /**
  * 引用传递类属性值
+ * @deprecated
  * @param $origin
  * @param $target
  * @param $prop
@@ -42,6 +43,7 @@ function ref_prop_value($origin, $target, $prop)
 
 /**
  * 拷贝类属性值
+ * @deprecated
  * @param $origin
  * @param $target
  * @param $prop

@@ -5,6 +5,7 @@ namespace Zxin\Tests;
 
 use PHPUnit\Framework\TestCase;
 use function Zxin\Str\str_fullwidth_to_ascii;
+use function Zxin\Str\str_replace_umlaut_unaccent;
 use function Zxin\Str\strcut_omit;
 
 class StrTest extends TestCase
@@ -62,5 +63,24 @@ class StrTest extends TestCase
     public function testStrFullwidthToAscii(string $fullwidth, string $ascii)
     {
         $this->assertEquals($ascii, str_fullwidth_to_ascii($fullwidth));
+    }
+
+    public function strReplaceUmlautUnaccentProvider(): array
+    {
+        return [
+            ['Š', 'S'],
+            ['á', 'a'],
+            ['áa?', 'aa?'],
+        ];
+    }
+
+    /**
+     * @dataProvider strReplaceUmlautUnaccentProvider
+     * @param string $str1
+     * @param string $str2
+     */
+    public function testStrReplaceUmlautUnaccent(string $str1, string $str2)
+    {
+        $this->assertEquals($str2, str_replace_umlaut_unaccent($str1));
     }
 }

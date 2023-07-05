@@ -17,9 +17,6 @@ use function ksort;
  * 示例：arrayMultisortField($arr, 'num', SORT_DESC, 'sort', SORT_ASC)
  * @like https://www.php.net/manual/zh/function.array-multisort.php
  * @like https://blog.csdn.net/qq_35296546/article/details/78812176
- * @param array $arr
- * @param array $args
- * @return array
  */
 function array_multi_field_sort(array $arr, ...$args): array
 {
