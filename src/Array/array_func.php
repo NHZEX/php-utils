@@ -33,6 +33,9 @@ function array_multi_field_sort(array $arr, ...$args): array
     return $arr;
 }
 
+/**
+ * @deprecated
+ */
 function array_flatten(array $a, string $previous = ''): array
 {
     return array_flatten_ex($a, '_', true, $previous);
