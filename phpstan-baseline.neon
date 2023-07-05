@@ -1,0 +1,6 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^PHPDoc tag @param for parameter \\$cb with type \\(callable\\)\\|string is not subtype of native type callable\\.$#"
+			count: 1
+			path: src/Array/array_func.php

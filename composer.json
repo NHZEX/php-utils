@@ -17,7 +17,8 @@
     "require-dev": {
         "ext-bcmath": "*",
         "ext-mbstring": "*",
-        "php-cs-fixer/shim": "^3.16",
+        "php-cs-fixer/shim": "^3.20",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9",
         "rector/rector": "~0.15.24",
         "symfony/var-dumper": "^5.4|^6"

@@ -1,0 +1,12 @@
+parameters:
+    level: 4
+    paths:
+        - src
+    excludePaths:
+        - src/DataStruct/*
+        - src/reflection_helper.php
+    scanFiles:
+    reportUnmatchedIgnoredErrors: true
+    ignoreErrors:
+includes:
+    - phpstan-baseline.neon
