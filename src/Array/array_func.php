@@ -33,22 +33,22 @@ function array_multi_field_sort(array $arr, ...$args): array
     return $arr;
 }
 
-/**
- * @param array  $a
- * @param string $previous
- * @return array
- */
 function array_flatten(array $a, string $previous = ''): array
 {
+    return array_flatten_ex($a, '_', true, $previous);
+}
+
+function array_flatten_ex(array $array, string $separator = '.', bool $sort = true, string $previous = ''): array
+{
     $mapping = [];
-    foreach ($a as $key => $value) {
-        if (!is_array($value)) {
-            $mapping[$previous . $key] = $value;
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            $mapping += array_flatten_ex($value, $separator, false, $previous . $key . $separator);
         } else {
-            $mapping += array_flatten($value, $previous . $key . '_');
+            $mapping[$previous . $key] = $value;
         }
     }
-    if (empty($previous)) {
+    if ($sort) {
         ksort($mapping);
     }
     return $mapping;
