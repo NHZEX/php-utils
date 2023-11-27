@@ -38,7 +38,7 @@ function array_flatten(array $a, string $previous = ''): array
     return array_flatten_ex($a, '_', true, $previous);
 }
 
-function array_flatten_ex(array $array, string $separator = '.', bool $sort = true, string $previous = ''): array
+function array_flatten_ex(iterable $array, string $separator = '.', bool $sort = true, string $previous = ''): array
 {
     $mapping = [];
     foreach ($array as $key => $value) {
@@ -87,11 +87,11 @@ function array_lazy_chunk(iterable $items, int $limit, bool $preserveKeys = true
 /**
  * @template T
  * @template K
- * @param array<K, T> $arr
+ * @param iterable<K, T> $arr
  * @param callable(T, K): int|string $cb
- * @return array<int|string, T>
+ * @return iterable<int|string, T>
  */
-function array_index_cb(array $arr, callable $cb): array
+function array_index_cb(iterable $arr, callable $cb): array
 {
     $output = [];
     foreach ($arr as $key => $item) {
@@ -133,10 +133,10 @@ function array_group(iterable $arr, $groupKey, bool $preserveKeys = true): array
  * @template TK of string|int
  * @template TV of mixed
  * @param callable $cb
- * @param array<TK, TV> $arr
- * @return array<TK, mixed>
+ * @param iterable<TK, TV> $arr
+ * @return iterable<TK, mixed>
  */
-function array_map_with_key(callable $cb, array $arr): array
+function array_map_with_key(callable $cb, iterable $arr): array
 {
     $out = [];
     foreach ($arr as $k => $v) {
