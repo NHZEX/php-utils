@@ -89,7 +89,7 @@ function array_lazy_chunk(iterable $items, int $limit, bool $preserveKeys = true
  * @template K
  * @param iterable<K, T> $arr
  * @param callable(T, K): int|string $cb
- * @return iterable<int|string, T>
+ * @return array<int|string, T>
  */
 function array_index_cb(iterable $arr, callable $cb): array
 {
@@ -134,7 +134,7 @@ function array_group(iterable $arr, $groupKey, bool $preserveKeys = true): array
  * @template TV of mixed
  * @param callable $cb
  * @param iterable<TK, TV> $arr
- * @return iterable<TK, mixed>
+ * @return array<TK, mixed>
  */
 function array_map_with_key(callable $cb, iterable $arr): array
 {
