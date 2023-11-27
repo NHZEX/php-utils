@@ -85,7 +85,7 @@ class Util
     public static function whoami(): string
     {
         if (!extension_loaded('posix')) {
-            return 'null';
+            return '';
         }
         return posix_getpwuid(posix_geteuid())['name'];
     }
