@@ -38,7 +38,11 @@ use function vsprintf;
  */
 function base64_urlsafe_encode(string $data): string
 {
-    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    if (function_exists('\sodium_bin2base64')) {
+        return sodium_bin2base64($data, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
+    } else {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
 }
 
 /**
@@ -50,10 +54,14 @@ function base64_urlsafe_encode(string $data): string
  */
 function base64_urlsafe_decode(string $data, bool $strict = true)
 {
-    if ($remainder = strlen($data) % 4) {
-        $data .= str_repeat('=', 4 - $remainder);
+    if (function_exists('\sodium_base642bin')) {
+        return sodium_base642bin($data, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
+    } else {
+        if ($remainder = strlen($data) % 4) {
+            $data .= str_repeat('=', 4 - $remainder);
+        }
+        return base64_decode(strtr($data, '-_', '+/'), $strict);
     }
-    return base64_decode(strtr($data, '-_', '+/'), $strict);
 }
 
 /**

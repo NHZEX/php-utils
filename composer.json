@@ -27,6 +27,7 @@
         "ext-bcmath": "unit convertor support",
         "ext-posix": "posix",
         "ext-mbstring": "mbstring",
+        "ext-sodium": "sodium",
         "symfony/var-dumper": "debug tool support"
     },
     "autoload": {
