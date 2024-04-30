@@ -101,6 +101,34 @@ class UtilTest extends Base
         $this->assertEquals($plaintext, $output);
     }
 
+    public function base64ExProvider(): array
+    {
+        return [
+            [hex2bin('d19085537f7aebf0ca16beebea'), '0ZCFU3966/DKFr7r6g==', false, true],
+            [hex2bin('24c7679be53f81a190a5032219'), 'JMdnm+U/gaGQpQMiGQ==', false, true],
+
+            [hex2bin('d19085537f7aebf0ca16beebea'), '0ZCFU3966/DKFr7r6g', false, false],
+            [hex2bin('24c7679be53f81a190a5032219'), 'JMdnm+U/gaGQpQMiGQ', false, false],
+
+            [hex2bin('d19085537f7aebf0ca16beebea'), '0ZCFU3966_DKFr7r6g==', true, true],
+            [hex2bin('24c7679be53f81a190a5032219'), 'JMdnm-U_gaGQpQMiGQ==', true, true],
+
+            [hex2bin('d19085537f7aebf0ca16beebea'), '0ZCFU3966_DKFr7r6g', true, false],
+            [hex2bin('24c7679be53f81a190a5032219'), 'JMdnm-U_gaGQpQMiGQ', true, false],
+        ];
+    }
+
+    /**
+     * @dataProvider base64ExProvider
+     */
+    public function testBase64Ex(string $plaintext, string $ciphertext, bool $urlsafe, bool $padding)
+    {
+        $result = Util\base64_encode_ex($plaintext, $urlsafe, $padding);
+        $this->assertEquals($ciphertext, $result);
+        $output = Util\base64_decode_ex($result, $urlsafe, $padding);
+        $this->assertEquals($plaintext, $output);
+    }
+
     /**
      * @requires extension openssl
      */

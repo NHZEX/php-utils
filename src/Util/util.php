@@ -38,31 +38,73 @@ use function vsprintf;
  */
 function base64_urlsafe_encode(string $data): string
 {
-    if (function_exists('\sodium_bin2base64')) {
-        return sodium_bin2base64($data, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
-    } else {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-    }
+    return base64_encode_ex($data, true, false);
 }
 
 /**
  * Base64 Url安全解码
  * @param string $data
- * @param bool   $strict
  * @return false|string
  * @link http://php.net/manual/zh/function.base64-encode.php
  */
-function base64_urlsafe_decode(string $data, bool $strict = true)
+function base64_urlsafe_decode(string $data)
 {
-    if (function_exists('\sodium_base642bin')) {
-        return sodium_base642bin($data, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
-    } else {
-        if ($remainder = strlen($data) % 4) {
-            $data .= str_repeat('=', 4 - $remainder);
+    if (func_num_args() >= 2) {
+        throw new \InvalidArgumentException('Deprecated parameter $strict');
+    }
+    return base64_decode_ex($data, true, false);
+}
+
+/**
+ * Base64 编码
+ * @link http://php.net/manual/zh/function.base64-encode.php
+ */
+function base64_encode_ex(string $data, bool $urlsafe = false, bool $padding = true): string
+{
+    if (function_exists('\sodium_bin2base64')) {
+        if (!$urlsafe) {
+            $flag = $padding ? SODIUM_BASE64_VARIANT_ORIGINAL : SODIUM_BASE64_VARIANT_ORIGINAL_NO_PADDING;
+        } else {
+            $flag = $padding ? SODIUM_BASE64_VARIANT_URLSAFE : SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING;
         }
-        return base64_decode(strtr($data, '-_', '+/'), $strict);
+        return sodium_bin2base64($data, $flag);
+    } else {
+        if (!$urlsafe) {
+            $result = base64_encode($data);
+        } else {
+            $result = strtr(base64_encode($data), '+/', '-_');
+        }
+        return $padding ? $result : rtrim($result, '=');
     }
 }
+
+/**
+ * Base64 解码
+ * @return false|string
+ * @link http://php.net/manual/zh/function.base64-encode.php
+ */
+function base64_decode_ex(string $data, bool $urlsafe = false, bool $padding = true)
+{
+    if (function_exists('\sodium_base642bin')) {
+        if (!$urlsafe) {
+            $flag = $padding ? SODIUM_BASE64_VARIANT_ORIGINAL : SODIUM_BASE64_VARIANT_ORIGINAL_NO_PADDING;
+        } else {
+            $flag = $padding ? SODIUM_BASE64_VARIANT_URLSAFE : SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING;
+        }
+        return sodium_base642bin($data, $flag);
+    } else {
+        if (!$padding) {
+            if ($remainder = strlen($data) % 4) {
+                $data .= str_repeat('=', 4 - $remainder);
+            }
+        }
+        if ($urlsafe) {
+            $data = strtr($data, '-_', '+/');
+        }
+        return base64_decode($data, true);
+    }
+}
+
 
 /**
  * 生成 uuid v4
