@@ -7,6 +7,7 @@ namespace Zxin\Util;
 use Exception;
 use RuntimeException;
 use Zxin\Util;
+
 use function base64_decode;
 use function base64_encode;
 use function bin2hex;
@@ -123,6 +124,37 @@ function uuidv4(): string
     $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
 
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
+/**
+ * @link https://gist.github.com/xhit/83f22ef5e7ab3971f7a35017cc5d31f9
+ * @see https://www.rfc-editor.org/rfc/rfc9562#name-uuid-version-7
+ */
+function uuidv7(): string
+{
+    // current timestamp in ms
+    $timestamp = (int) (microtime(true) * 1000);
+
+    return sprintf(
+        '%02x%02x%02x%02x-%02x%02x-%04x-%04x-%012x',
+        // first 48 bits are timestamp based
+        ($timestamp >> 40) & 0xFF,
+        ($timestamp >> 32) & 0xFF,
+        ($timestamp >> 24) & 0xFF,
+        ($timestamp >> 16) & 0xFF,
+        ($timestamp >> 8) & 0xFF,
+        $timestamp & 0xFF,
+
+        // 16 bits: 4 bits for version (7) and 12 bits for rand_a
+        random_int(0, 0x0FFF) | 0x7000,
+
+        // 16 bits: 4 bits for variant where 2 bits are fixed 10 and next 2 are random to get (8-9, a-b)
+        // next 12 are random
+        random_int(0, 0x3FFF) | 0x8000,
+
+        // random 48 bits
+        random_int(0, 0xFFFFFFFFFFFF),
+    );
 }
 
 /**

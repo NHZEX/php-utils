@@ -4,6 +4,7 @@ namespace Zxin\Tests;
 
 use Generator;
 use Zxin\Util;
+
 use function hex2bin;
 use function strlen;
 
@@ -138,6 +139,14 @@ class UtilTest extends Base
         $this->assertEquals(36, strlen($uuid));
     }
 
+    /**
+     * @requires extension openssl
+     */
+    public function testUuidV7()
+    {
+        $uuid = Util\uuidv7();
+        $this->assertEquals(36, strlen($uuid));
+    }
 
     public function parseStrToIpAndPortProvider(): Generator
     {
